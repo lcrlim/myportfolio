@@ -3,7 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TcpServerWithNitoAsync", "TcpServerWithNitoAsync\TcpServerWithNitoAsync.csproj", "{3488BE78-09CE-4F4A-9DF0-671E2B0B7D87}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TcpServerStandard", "TcpServerWithNitoAsync\TcpServerStandard.csproj", "{3488BE78-09CE-4F4A-9DF0-671E2B0B7D87}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TcpServerFramework", "TcpServerByNitoAsync\TcpServerFramework.csproj", "{28D43D73-4F9E-4DA5-A7EB-D3427190334A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nito.Async", "OpenSource\Nito.Async\Nito.Async.csproj", "{708763ED-7801-4F2C-B103-4FEBD771769A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nito.Async.Sockets", "OpenSource\Nito.Async.Sockets\Nito.Async.Sockets.csproj", "{B412B766-BEC2-407C-A7A1-0E5257511515}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +21,18 @@ Global
 		{3488BE78-09CE-4F4A-9DF0-671E2B0B7D87}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3488BE78-09CE-4F4A-9DF0-671E2B0B7D87}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3488BE78-09CE-4F4A-9DF0-671E2B0B7D87}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28D43D73-4F9E-4DA5-A7EB-D3427190334A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28D43D73-4F9E-4DA5-A7EB-D3427190334A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28D43D73-4F9E-4DA5-A7EB-D3427190334A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28D43D73-4F9E-4DA5-A7EB-D3427190334A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{708763ED-7801-4F2C-B103-4FEBD771769A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{708763ED-7801-4F2C-B103-4FEBD771769A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{708763ED-7801-4F2C-B103-4FEBD771769A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{708763ED-7801-4F2C-B103-4FEBD771769A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B412B766-BEC2-407C-A7A1-0E5257511515}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B412B766-BEC2-407C-A7A1-0E5257511515}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B412B766-BEC2-407C-A7A1-0E5257511515}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B412B766-BEC2-407C-A7A1-0E5257511515}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
