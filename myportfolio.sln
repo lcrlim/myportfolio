@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TcpServerFramework", "TcpSe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TcpServerStandard", "TcpServerStandard\TcpServerStandard.csproj", "{1E606A25-15E3-437A-AD03-901BDD97E1E9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThrottleApiServer", "ThrottleApiServer\ThrottleApiServer.csproj", "{90E513A8-14B5-4D65-B746-2B81216E36E9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utils", "Utils\Utils.csproj", "{83F64F73-C7A7-4BBE-8E92-9A481E4749DF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +37,14 @@ Global
 		{1E606A25-15E3-437A-AD03-901BDD97E1E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1E606A25-15E3-437A-AD03-901BDD97E1E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1E606A25-15E3-437A-AD03-901BDD97E1E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{90E513A8-14B5-4D65-B746-2B81216E36E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90E513A8-14B5-4D65-B746-2B81216E36E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90E513A8-14B5-4D65-B746-2B81216E36E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90E513A8-14B5-4D65-B746-2B81216E36E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83F64F73-C7A7-4BBE-8E92-9A481E4749DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83F64F73-C7A7-4BBE-8E92-9A481E4749DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83F64F73-C7A7-4BBE-8E92-9A481E4749DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83F64F73-C7A7-4BBE-8E92-9A481E4749DF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
