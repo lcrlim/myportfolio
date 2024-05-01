@@ -7,7 +7,5 @@
 
   
 Projects
-- TcpServerFramework  => 오픈소스 라이브러리를 사용해 간단한 TCP 서버를 구현한다.
+- TcpServerStandard  => 닷넷 스탠다드 기반으로 비동기 tcp server의 기본적 틀을 구현한다.
 - ThrottleApiServer => Owin selfhosing 서버 API에 Throttling을 적용하기위해 오픈 소스를 사용하고, 데이터 저장소를 기본(Redis)이 아닌 MSSQL로 사용하도록 코드를 구현한다.
-- DBExecution => 기본적인 MSSQL 호출을 감싸고 SP를 호출하는 코드를 구현한다.
-- Utils => 기타 간단한 코드들의 집합
