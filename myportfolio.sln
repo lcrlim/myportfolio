@@ -15,6 +15,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThrottleApiServer", "Thrott
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utils", "Utils\Utils.csproj", "{83F64F73-C7A7-4BBE-8E92-9A481E4749DF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetStandardUnitTest", "NetStandardUnitTest\NetStandardUnitTest.csproj", "{B84ED3CA-E89F-4DB0-A335-5102FFF5968E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetFrameworkUnitTest", "NetFrameworkUnitTest\NetFrameworkUnitTest.csproj", "{B0B57AA2-F765-489D-BC75-DF905ACEBCDC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +49,14 @@ Global
 		{83F64F73-C7A7-4BBE-8E92-9A481E4749DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{83F64F73-C7A7-4BBE-8E92-9A481E4749DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{83F64F73-C7A7-4BBE-8E92-9A481E4749DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B84ED3CA-E89F-4DB0-A335-5102FFF5968E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B84ED3CA-E89F-4DB0-A335-5102FFF5968E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B84ED3CA-E89F-4DB0-A335-5102FFF5968E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B84ED3CA-E89F-4DB0-A335-5102FFF5968E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0B57AA2-F765-489D-BC75-DF905ACEBCDC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0B57AA2-F765-489D-BC75-DF905ACEBCDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0B57AA2-F765-489D-BC75-DF905ACEBCDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0B57AA2-F765-489D-BC75-DF905ACEBCDC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
