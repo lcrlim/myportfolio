@@ -16,7 +16,7 @@ namespace ThrottleApiServer
         {
             string baseAddress = "http://localhost:9000/";
 
-            using (WebApp.Start<Startup1>(baseAddress))
+            using (WebApp.Start<Startup>(baseAddress))
             {
                 // Create HttpClient and make a request to api/values 
                 HttpClient client = new HttpClient();

@@ -9,7 +9,7 @@ using System.Web.Http;
 
 namespace ThrottleApiServer
 {
-    public class Startup1
+    public class Startup
     {
         public void Configuration(IAppBuilder app)
         {
