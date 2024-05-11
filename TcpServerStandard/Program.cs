@@ -12,8 +12,10 @@ public class Program
     {
         // 로그 초기화
         Log.Logger = new LoggerConfiguration()
-            .WriteTo.Console()
-            .WriteTo.File($"logs/log_.txt", rollingInterval: RollingInterval.Day)
+            .WriteTo.Console(outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff}] [{Level:u3}] [{ThreadId}] {Message:lj}{NewLine}")
+            .WriteTo.File($"logs/log_.txt", rollingInterval: RollingInterval.Day,
+                outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff}] [{Level:u3}] [{ThreadId}] {Message:lj}{NewLine}")
+            .Enrich.WithThreadId()
             .CreateLogger();
 
         int port = 8888;

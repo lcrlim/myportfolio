@@ -6,6 +6,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Serilog;
+using System.Runtime.CompilerServices;
 
 namespace CommonNetwork
 {
@@ -39,7 +40,10 @@ namespace CommonNetwork
 
             server.Start();
             ctoken.Register(server.Stop);
-            Log.Information($"TCP Server started - Port:{port}, IsThreadPool:{Thread.CurrentThread.IsThreadPoolThread}");            
+
+            // 여기서 부터 비동기로 실행되도록 yield하여 thread pool 에서 accept 작업을 실행하도록 한다.
+            await Task.Yield();
+            Log.Information($"TCP Server started - Port:{port}, IsThreadPool:{Thread.CurrentThread.IsThreadPoolThread}");
 
             while (!ctoken.IsCancellationRequested)
             {
@@ -51,7 +55,8 @@ namespace CommonNetwork
 
                     // 신규 연결 시 새로운 워커 생성 후 Run
                     var work = new ClientWorker(conn, this.dispatcher, ctoken);
-                    _ = Task.Run(work.RunReadAsync, ctoken);
+                    //_ = Task.Run(work.RunReadAsync, ctoken);
+                    _ = work.RunReadAsync();
                 }
                 catch (OperationCanceledException)
                 {

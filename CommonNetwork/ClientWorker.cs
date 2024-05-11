@@ -54,7 +54,15 @@ namespace CommonNetwork
             }
             catch (ObjectDisposedException)
             {
-                Log.Logger.Debug($"Connection closed");
+                Log.Logger.Information($"Connection closed");
+            }
+            catch (IOException)
+            {
+                Log.Logger.Information($"Connection closed, write failed");
+            }
+            catch (SocketException)
+            {
+                Log.Logger.Information($"Connection closed");
             }
             catch (Exception ex)
             {

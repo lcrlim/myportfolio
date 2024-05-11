@@ -47,8 +47,8 @@ namespace TcpServerStandard
         {
             PacketPing? req = JsonConvert.DeserializeObject<PacketPing>(packet.Body);
 
-            Log.Logger.Information($"Ping - Num:{req.Num}, Str:{req.Str}");
-
+            Log.Logger.Information($"Packet arrived - Ping, Num:{req.Num}, Str:{req.Str}");
+            Thread.Sleep(2000);
             return new PacketPong
             {
                 Num = req.Num,
