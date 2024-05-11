@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Serilog;
 
-namespace TcpServerStandard
+namespace CommonNetwork
 {
     /// <summary>
     /// 서버 객체
@@ -15,6 +15,7 @@ namespace TcpServerStandard
     public class TcpServer
     {
         private TcpListener? server;
+        private IPacketDispatcher dispatcher;
 
         /// <summary>
         /// 서버 시작
@@ -22,16 +23,23 @@ namespace TcpServerStandard
         /// <param name="port"></param>
         /// <param name="ctoken"></param>
         /// <returns></returns>
-        public async Task Start(int port, CancellationToken ctoken)
+        public async Task Start(int port, IPacketDispatcher dispatcher, CancellationToken ctoken)
         {
             if (server == null)
             {
                 server = new TcpListener(IPAddress.Any, port);
             }
+            if (dispatcher == null)
+            {
+                Log.Logger.Error("Packet dispatcher is null");
+                throw new Exception("Packet dispatcher is null");
+            }
+
+            this.dispatcher = dispatcher;
 
             server.Start();
             ctoken.Register(server.Stop);
-            Log.Information($"TCP Server started - Port:{port}");            
+            Log.Information($"TCP Server started - Port:{port}, IsThreadPool:{Thread.CurrentThread.IsThreadPoolThread}");            
 
             while (!ctoken.IsCancellationRequested)
             {
@@ -41,8 +49,9 @@ namespace TcpServerStandard
                     TcpClient conn = await server.AcceptTcpClientAsync(ctoken).ConfigureAwait(false);
                     Log.Information($"New connection arrived - {conn.Client.RemoteEndPoint}");
 
-                    var work = new WorkTask(conn, ctoken);
-                    _ = Task.Run(work.Run, ctoken);
+                    // 신규 연결 시 새로운 워커 생성 후 Run
+                    var work = new ClientWorker(conn, this.dispatcher, ctoken);
+                    _ = Task.Run(work.RunReadAsync, ctoken);
                 }
                 catch (OperationCanceledException)
                 {

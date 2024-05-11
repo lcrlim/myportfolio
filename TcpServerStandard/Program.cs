@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using CommonNetwork;
 using Serilog;
 using TcpServerStandard;
 
@@ -15,14 +16,21 @@ public class Program
             .WriteTo.File($"logs/log_.txt", rollingInterval: RollingInterval.Day)
             .CreateLogger();
 
+        int port = 8888;
+        if (args.Length > 0)
+        {
+            // 임의로 1번째는 포트
+            int.TryParse(args[0], out port);
+        }
+
         TcpServer server = new TcpServer();
 
         var cts = new CancellationTokenSource();
-        var startedTask = server.Start(8888, cts.Token);
+        var startedTask = server.Start(port, new PacketDispatcher(), cts.Token);
 
         var process = Process.GetCurrentProcess();
 
-        Log.Logger.Information($"Tcp server start {process.ProcessName}(PID:{process.Id})");
+        Log.Logger.Information($"Tcp server start {process.ProcessName}(PID:{process.Id}) - Port:{port}");
 
         while (true)
         {

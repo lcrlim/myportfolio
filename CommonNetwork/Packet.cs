@@ -4,20 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TcpServerStandard
+namespace CommonNetwork
 {
-    /// <summary>
-    /// 패킷 기본 클래스
-    /// </summary>
-    public class PacketBase
-    {
-
-    }
-
     /// <summary>
     /// 샘플 ping 패킷
     /// </summary>
-    public class PacketPing : PacketBase
+    public class PacketPing
     {
         public int Num { get; set; }
         public string? Str { get; set; }
@@ -26,7 +18,7 @@ namespace TcpServerStandard
     /// <summary>
     /// 샘플 pong 패킷
     /// </summary>
-    public class PacketPong : PacketBase
+    public class PacketPong
     {
         public int Num { get; set; }
         public string? Str { get; set; }

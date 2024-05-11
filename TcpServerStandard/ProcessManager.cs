@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace TcpServerStandard
 {
+    /// <summary>
+    /// 콘솔 프로그램의 종료 대기
+    /// </summary>
     public class ProcessManager
     {
         public static readonly ProcessManager Instance = new ProcessManager();
