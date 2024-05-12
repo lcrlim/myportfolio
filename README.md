@@ -10,8 +10,8 @@ Projects
 - Packet 구조
 - 
   ![packet 구조](https://github.com/lcrlim/myportfolio/assets/68598899/6efdf136-fed6-4640-a34a-a7f0d35a20c0)
-- Length, Type은 고정 4바이트, Body는 동적이고 Json String (UTF8)로 구현되어 있다. (다른 직렬화 Rule을 적용할 경우 PacketParser를 상속받아 별도 클래스 구현하면 된다.)
+  - Length, Type은 고정 4바이트, Body는 동적이고 Json String (UTF8)로 구현되어 있다. (다른 직렬화 Rule을 적용할 경우 PacketParser를 상속받아 별도 클래스 구현하면 된다.)
 
   
-- NetStandardUnitTest => 닷넷 스탠다드 단위 테스트 프로젝
+- NetStandardUnitTest => 닷넷 스탠다드 단위 테스트 프로젝트
 - ThrottleApiServer => Owin selfhosing 서버 API에 Throttling을 적용하기위해 오픈 소스를 사용하고, 데이터 저장소를 기본(Redis)이 아닌 MSSQL로 사용하도록 코드를 구현한다.
