@@ -6,7 +6,13 @@
   
 Projects
 - TcpServerStandard  => 닷넷 스탠다드 기반으로 비동기 tcp server의 기본적 틀을 구현한다.
+  - MyCommonNet을 사용한 서버 콘솔 프로그램 구현
+  - 패킷 파서 구현 클래스
 - MyCommonNet => 닷넷 스탠다드에서 사용할 네트워크 공통 라이브러리
+  - 기본 패킷 클래스 구현
+  - 패킷 파서 인터페이스
+  - TCP서버 객체
+  - Client Connection 패킷 처리 워커
 - Packet 구조
 - ![packet 구조](https://github.com/lcrlim/myportfolio/assets/68598899/8384e376-a3c6-4991-b181-9f05b76384f5)
   - Length, Type은 고정 4바이트, Body는 동적이고 Json String (UTF8)로 구현되어 있다. (다른 직렬화 Rule을 적용할 경우 PacketParser를 상속받아 별도 클래스 구현하면 된다.)
