@@ -11,7 +11,7 @@ Projects
 - MyCommonNet => 닷넷 스탠다드에서 사용할 네트워크 공통 라이브러리
   - 기본 패킷 클래스 구현
   - 패킷 파서 인터페이스
-  - TCP서버 객체
+  - TCP서버 객체 : TcpListener를 사용하여 TAP(작업 기반 비동기 패턴)로 구현, 비동기 처리로 고용량 처리를 목적으로 함
   - Client Connection 패킷 처리 워커
 - Packet 구조
 - ![packet 구조](https://github.com/lcrlim/myportfolio/assets/68598899/8384e376-a3c6-4991-b181-9f05b76384f5)
