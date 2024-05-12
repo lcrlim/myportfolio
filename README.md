@@ -6,7 +6,7 @@
   
 Projects
 - TcpServerStandard  => 닷넷 스탠다드 기반으로 비동기 tcp server의 기본적 틀을 구현한다.
-- CommonNetwork => 닷넷 스탠다드에서 사용할 네트워크 공통 라이브러리
+- MyCommonNet => 닷넷 스탠다드에서 사용할 네트워크 공통 라이브러리
 - Packet 구조
 - 
   ![packet 구조](https://github.com/lcrlim/myportfolio/assets/68598899/6efdf136-fed6-4640-a34a-a7f0d35a20c0)
