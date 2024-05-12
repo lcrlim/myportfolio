@@ -1,4 +1,4 @@
-using CommonNetwork;
+using MyCommonNet;
 using Serilog;
 
 namespace NetStandardUnitTest

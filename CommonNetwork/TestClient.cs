@@ -6,7 +6,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CommonNetwork
+namespace MyCommonNet
 {
     /// <summary>
     /// 테스트용 클라이언트
@@ -41,17 +41,17 @@ namespace CommonNetwork
         /// <typeparam name="T"></typeparam>
         /// <param name="req"></param>
         /// <returns></returns>
-        private async Task<T> SendAndReceive<T>(PacketBase req)
+        private async Task<T> SendAndReceive<T>(MyPacket req)
         {
-            await parser.WritePacketBase(req);
-            PacketBase res = await parser.ReadPacketBase();
+            await parser.WritePacket(req);
+            MyPacket res = await parser.ReadPacket();
 
             return JsonConvert.DeserializeObject<T>(res.Body);
         }
 
         public async Task<PacketPong> Ping(int pingNumber, string pingString)
         {
-            var req = new PacketBase
+            var req = new MyPacket
             {
                 Type = (int)Packet.Type.PING,
                 Body = JsonConvert.SerializeObject(new PacketPing

@@ -1,4 +1,4 @@
-﻿using CommonNetwork;
+﻿using MyCommonNet;
 using Newtonsoft.Json;
 using Serilog;
 using System;
@@ -16,26 +16,34 @@ namespace TcpServerStandard
         /// </summary>
         /// <param name="req"></param>
         /// <returns></returns>
-        public async Task<PacketBase?> Dispatch(PacketBase req)
+        public async Task<MyPacket?> Dispatch(MyPacket req)
         {
             // 여기에서 데이터를 원하는 형태로 파싱하고 처리합니다.
-            PacketBase res = new PacketBase();
-            switch (req.Type)
+            try
             {
-                case (int)Packet.Type.PING:
-                    {
-                        var pong = await Ping(req).ConfigureAwait(false);
-                        res.Type = (int)Packet.Type.PONG;
-                        res.Body = JsonConvert.SerializeObject(pong);
-                        break;
-                    }
-                default:
-                    {
-                        Log.Logger.Information($"Undefined packet type - PacketType:{req.Type}");
-                        return null;
-                    }
+                MyPacket res = new MyPacket();
+                switch (req.Type)
+                {
+                    case (int)Packet.Type.PING:
+                        {
+                            var pong = await Ping(req).ConfigureAwait(false);
+                            res.Type = (int)Packet.Type.PONG;
+                            res.Body = JsonConvert.SerializeObject(pong);
+                            break;
+                        }
+                    default:
+                        {
+                            Log.Logger.Information($"Undefined packet type - PacketType:{req.Type}");
+                            return null;
+                        }
+                }
+                return res;
             }
-            return res;
+            catch (Exception e)
+            {
+                Log.Information($"");
+                throw;
+            }
         }
 
         /// <summary>
@@ -43,7 +51,7 @@ namespace TcpServerStandard
         /// </summary>
         /// <param name="packet"></param>
         /// <returns></returns>
-        public async Task<PacketPong> Ping(PacketBase packet)
+        public async Task<PacketPong> Ping(MyPacket packet)
         {
             PacketPing? req = JsonConvert.DeserializeObject<PacketPing>(packet.Body);
 

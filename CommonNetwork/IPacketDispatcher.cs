@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CommonNetwork
+namespace MyCommonNet
 {
     public interface IPacketDispatcher
     {
-        public Task<PacketBase?> Dispatch(PacketBase req);
+        public Task<MyPacket?> Dispatch(MyPacket req);
     }
 }

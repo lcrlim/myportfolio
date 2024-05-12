@@ -2,7 +2,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using CommonNetwork;
+using MyCommonNet;
 using Serilog;
 using TcpServerStandard;
 

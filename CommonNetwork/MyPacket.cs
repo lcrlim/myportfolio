@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CommonNetwork
+namespace MyCommonNet
 {
     /// <summary>
     /// 패킷 헤더
     /// </summary>
-    public class PacketBase
+    public class MyPacket
     {
         /// <summary>
         /// 패킷 총 길이, 4바이트, Len 항목의 길이도 포함

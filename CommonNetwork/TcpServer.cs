@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Serilog;
 using System.Runtime.CompilerServices;
 
-namespace CommonNetwork
+namespace MyCommonNet
 {
     /// <summary>
     /// 서버 객체

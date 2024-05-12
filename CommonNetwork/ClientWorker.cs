@@ -11,7 +11,7 @@ using System.Text.Json;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 
-namespace CommonNetwork
+namespace MyCommonNet
 {
     /// <summary>
     /// 클라이언트 작업자, 패킷 읽기 쓰기를 비동기로 처리
@@ -41,13 +41,13 @@ namespace CommonNetwork
                     while (true)
                     {
                         // 패킷 읽기                        
-                        PacketBase req = await parser.ReadPacketBase().ConfigureAwait(false);
+                        MyPacket req = await parser.ReadPacket().ConfigureAwait(false);
 
                         // 여기서 데이터를 원하는 형태로 파싱하고 처리합니다.
-                        PacketBase? res = await this.dispatcher.Dispatch(req).ConfigureAwait(false);
+                        MyPacket? res = await this.dispatcher.Dispatch(req).ConfigureAwait(false);
                         if (res != null)
                         {
-                            await parser.WritePacketBase(res).ConfigureAwait(false);
+                            await parser.WritePacket(res).ConfigureAwait(false);
                         }
                     }
                 }
@@ -59,10 +59,6 @@ namespace CommonNetwork
             catch (IOException)
             {
                 Log.Logger.Information($"Connection closed, write failed");
-            }
-            catch (SocketException)
-            {
-                Log.Logger.Information($"Connection closed");
             }
             catch (Exception ex)
             {

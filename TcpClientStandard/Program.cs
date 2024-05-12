@@ -1,4 +1,4 @@
-﻿using CommonNetwork;
+﻿using MyCommonNet;
 using Serilog;
 using System.Net.NetworkInformation;
 using System.Net.Quic;
