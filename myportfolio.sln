@@ -17,9 +17,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utils", "Utils\Utils.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetStandardUnitTest", "NetStandardUnitTest\NetStandardUnitTest.csproj", "{B84ED3CA-E89F-4DB0-A335-5102FFF5968E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TcpClientStandard", "TcpClientStandard\TcpClientStandard.csproj", "{6961A073-753F-4C64-BCE2-2F55ABBF850D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TcpClientStandard", "TcpClientStandard\TcpClientStandard.csproj", "{6961A073-753F-4C64-BCE2-2F55ABBF850D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonNetwork", "CommonNetwork\CommonNetwork.csproj", "{2DDA4956-5452-4668-B01D-9B84D3C37451}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyCommonNet", "CommonNetwork\MyCommonNet.csproj", "{2DDA4956-5452-4668-B01D-9B84D3C37451}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
