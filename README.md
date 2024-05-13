@@ -22,6 +22,7 @@ Projects
   
   - NetStandardUnitTest => 닷넷 스탠다드 단위 테스트 프로젝트
     - 간단한 테스트 케이스로 client와 server 사이에 ping / pong 을 주고 받는 테스트 케이스 구현
+    - TODO : 성능 테스트 케이스 구현하여 초당 몇 개의 요청을 처리할 수 있는지 체크해 보자...
    
       
 2. ThrottleApiServer
