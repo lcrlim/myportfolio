@@ -136,8 +136,8 @@ namespace TcpServerFramework
                 }
                 else
                 {
-                    Packet packet = SerializeExtention.Deserialize<Packet>(e.Result);
-                    PacketEventHandler.Instance.Publish(packet);
+                    //Packet packet = JsonConvert.DeserializeObject<Packet>(e.Result);
+                    //PacketEventHandler.Instance.Publish(packet);
                 }
             }
             catch (Exception ex)
@@ -209,7 +209,7 @@ namespace TcpServerFramework
             {
                 ((System.Threading.Timer)s).Dispose();
                 tcs.TrySetException(new TimeoutException($"Request timed out"));
-                PacketEventHandler.Instance.RemoveExpirePacket();
+                //PacketEventHandler.Instance.RemoveExpirePacket();
             });
             int tcpResponseTimeout = 10 * 1000;
             if (timeoutSec != null)

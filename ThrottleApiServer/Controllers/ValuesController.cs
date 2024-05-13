@@ -8,6 +8,7 @@ using WebApiThrottle;
 
 namespace ThrottleApiServer
 {
+    [EnableThrottling]
     public class ValuesController : ApiController
     {
         // GET api/values 
@@ -17,7 +18,6 @@ namespace ThrottleApiServer
         }
 
         // GET api/values/5 
-        [EnableThrottling(PerSecond = 3)]
         public string Get(int id)
         {
             return "value";

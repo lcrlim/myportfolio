@@ -17,8 +17,7 @@ namespace TcpServerFramework
         public PacketParser(IAsyncTcpConnection socket)
         {
             this.Socket = socket;
-            int len = 4;
-            this.lengthBuffer = new byte[len];
+            this.lengthBuffer = new byte[Statics.PacketLengthSize];
         }
 
         public event Action<AsyncResultEventArgs<byte[]>> PacketArrived;
@@ -79,10 +78,10 @@ namespace TcpServerFramework
                 else
                 {
                     int length = 0;
-                    if (lengthBuffer.Length == 16)
+                    if (lengthBuffer.Length == Statics.PacketHeaderSize)
                     {
                         // 패킷 구조가 id(4 byte), seq(8byte), length(4byte) 이기때문에 12 바이트 이후 값을 length로 가져온다.
-                        length = BitConverter.ToInt32(lengthBuffer, 12);
+                        length = BitConverter.ToInt32(lengthBuffer, Statics.PacketTypeSize + Statics.PacketSeqSize);
                     }
 
                     if (length < 0)
