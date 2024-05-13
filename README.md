@@ -21,4 +21,7 @@ Projects
   
 - NetStandardUnitTest => 닷넷 스탠다드 단위 테스트 프로젝트
   - 간단한 테스트 케이스로 client와 server 사이에 ping / pong 을 주고 받는 테스트 케이스 구현
-- ThrottleApiServer => Owin selfhosing 서버 API에 Throttling을 적용하기위해 오픈 소스를 사용하고, 데이터 저장소를 기본(Redis)이 아닌 MSSQL로 사용하도록 코드를 구현한다.
+- ThrottleApiServer => Owin Self-Hosing 서버 API에 Throttling을 적용하기위해 오픈 소스(WebApiThrottle)를 사용하고, 데이터 저장소를 기본(Redis)이 아닌 MSSQL로 사용하도록 코드를 구현한다.
+  - 현재 상태에는 PerSecond or PerMinute or PerHour 등의 1가지 속성만 적용할 수 있으며, 여러 요소를 동시에 적용하기 위해서는 오픈소스 코드를 일부 수정하면 가능하다.
+  - IP address 당 제한 / Endpoint 당 제한 / Client 식별자 당 제한 등을 사용할 수 있고, whilelist 등의 기능도 설정 할 수 있다.
+  - 제한 설정은 Controller 전체에 또는 API당 제한 값을 다르게 설정할 수 있다.
