@@ -21,6 +21,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestTcpClient", "TcpClientS
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyCommonNet", "CommonNetwork\MyCommonNet.csproj", "{2DDA4956-5452-4668-B01D-9B84D3C37451}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenSource", "OpenSource", "{50BF3E6D-F3B9-4007-A394-BFFD5423BD52}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApiThrottle", "OpenSource\WebApiThrottle\WebApiThrottle.csproj", "{F049811F-BC05-4CEE-B329-CE3BF2E2E4BE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,9 +67,18 @@ Global
 		{2DDA4956-5452-4668-B01D-9B84D3C37451}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2DDA4956-5452-4668-B01D-9B84D3C37451}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2DDA4956-5452-4668-B01D-9B84D3C37451}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F049811F-BC05-4CEE-B329-CE3BF2E2E4BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F049811F-BC05-4CEE-B329-CE3BF2E2E4BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F049811F-BC05-4CEE-B329-CE3BF2E2E4BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F049811F-BC05-4CEE-B329-CE3BF2E2E4BE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{708763ED-7801-4F2C-B103-4FEBD771769A} = {50BF3E6D-F3B9-4007-A394-BFFD5423BD52}
+		{B412B766-BEC2-407C-A7A1-0E5257511515} = {50BF3E6D-F3B9-4007-A394-BFFD5423BD52}
+		{F049811F-BC05-4CEE-B329-CE3BF2E2E4BE} = {50BF3E6D-F3B9-4007-A394-BFFD5423BD52}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {08B61B31-C2D9-422B-8F44-43CEA6B35DEC}
