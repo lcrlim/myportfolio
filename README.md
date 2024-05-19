@@ -16,7 +16,7 @@ Projects
     - TCP서버 객체 : TcpListener를 사용하여 TAP(작업 기반 비동기 패턴)로 구현, 비동기 처리로 고용량 처리를 목적으로 함
     - Client Connection 패킷 처리 Worker
     - 로깅은 Serilog 사용
-    -    ![TcpServer구조](https://github.com/lcrlim/myportfolio/assets/68598899/72bd7cd7-ad9c-47b5-abe9-6fbbb0a02994)
+    - ![TcpServer구조](https://github.com/lcrlim/myportfolio/assets/68598899/a7e28913-1d55-46a6-b641-ab73cfec3736)
 
   - Packet 구조
   - ![packet 구조](https://github.com/lcrlim/myportfolio/assets/68598899/8384e376-a3c6-4991-b181-9f05b76384f5)
