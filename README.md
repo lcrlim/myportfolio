@@ -1,4 +1,4 @@
-.NET Standard, .NET Framework를 사용하는 네트워크 서버 코드 모음입니다.
+개인적인 목적으로 개발하는 .NET Standard, .NET Framework를 사용하는 네트워크 서버 코드 모음입니다.
 
 - 포트폴리오
 - 기타 구현 참고용
