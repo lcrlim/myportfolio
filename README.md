@@ -1,4 +1,5 @@
-개인 학습과 샘플코드를 활용한 포트폴리오를 목적으로 하는 .NET Standard를 사용하는 TCP 서버 Prototype과 기타 코드의 모음입니다.
+개인 학습과 포트폴리오를 위한 샘플 코드 프로젝트 입니다.
+.NET Standard를 사용하는 TCP 서버 Prototype과 기타 코드의 모음입니다.
   
 Projects
 
