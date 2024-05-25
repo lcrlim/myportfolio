@@ -1,8 +1,4 @@
-개인적인 학습을 목적으로 하는 .NET Standard, .NET Framework를 사용하는 네트워크 서버 코드 샘플 입니다.
-
-- 포트폴리오
-- 기타 구현 참고용
-
+개인 학습과 샘플코드를 활용한 포트폴리오를 목적으로 하는 .NET Standard를 사용하는 TCP 서버 Prototype과 기타 코드의 모음입니다.
   
 Projects
 
