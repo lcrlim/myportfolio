@@ -56,4 +56,5 @@ jobs:
         dotnet build TcpClientStandard/TestTcpClient.csproj --configuration Release
         dotnet build NetStandardUnitTest/NetStandardUnitTest.csproj --configuration Release
         
-        # 추가 .NET 8.0 프로젝트들을 여기에 나열
+    - name: Test
+      run: dotnet test --no-build --verbosity normal --configuration Release
