@@ -1,7 +1,33 @@
-# This workflow will build a .NET project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+# # This workflow will build a .NET project
+# # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
 
-name: .NET
+# name: .NET
+
+# on:
+#   push:
+#     branches: [ "master" ]
+#   pull_request:
+#     branches: [ "master" ]
+
+# jobs:
+#   build:
+
+#     runs-on: windows-latest
+
+#     steps:
+#     - uses: actions/checkout@v4
+#     - name: Setup .NET
+#       uses: actions/setup-dotnet@v4
+#       with:
+#         dotnet-version: 8.0.x
+#     - name: Restore dependencies
+#       run: dotnet restore --no-cache
+#     - name: Build
+#       run: dotnet build --no-restore --configuration Release --framework net8.0
+#     - name: Test
+#       run: dotnet test --no-build --verbosity normal --configuration Release --framework net8.0
+
+name: Build Selected .NET Projects
 
 on:
   push:
@@ -11,18 +37,44 @@ on:
 
 jobs:
   build:
-
-    runs-on: windows-latest
+    runs-on: windows-latest # Windows 환경
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 8.0.x
-    - name: Restore dependencies
-      run: dotnet restore --no-cache
-    - name: Build
-      run: dotnet build --no-restore --configuration Release --framework net8.0
-    - name: Test
-      run: dotnet test --no-build --verbosity normal --configuration Release --framework net8.0
+      # 1. 리포지토리 체크아웃
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. 디렉토리 구조 확인 (디버깅용)
+      - name: List directory structure
+        run: dir
+        shell: cmd
+        # 실행 후 로그에서 프로젝트 파일 경로 확인
+
+      # 3. .NET SDK 8.0.x 설치
+      - name: Setup .NET 8.0.x
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x' # .NET 8.0.x SDK 설치
+
+      # 4. NuGet 패키지 복원
+      - name: Restore dependencies for NetCoreWebServer
+        run: dotnet restore D:/a/myportfolio/myportfolio/TcpServerStandard/NetCoreWebServer.csproj
+        # 경로를 실제 경로로 조정
+
+      - name: Restore dependencies for NetStandardUnitTest
+        run: dotnet restore D:/a/myportfolio/myportfolio/NetStandardUnitTest/NetStandardUnitTest.csproj
+        # 경로를 실제 경로로 조정
+
+      # 5. .NET 프로젝트 빌드
+      - name: Build NetCoreWebServer
+        run: dotnet build D:/a/myportfolio/myportfolio/TcpServerStandard/NetCoreWebServer.csproj --no-restore --configuration Release --framework net8.0
+        # NetCoreWebServer 프로젝트만 빌드
+
+      - name: Build NetStandardUnitTest
+        run: dotnet build D:/a/myportfolio/myportfolio/NetStandardUnitTest/NetStandardUnitTest.csproj --no-restore --configuration Release --framework net8.0
+        # NetStandardUnitTest 프로젝트만 빌드
+
+      # 6. (선택) 테스트 실행
+      - name: Run tests for NetStandardUnitTest
+        run: dotnet test D:/a/myportfolio/myportfolio/NetStandardUnitTest/NetStandardUnitTest.csproj --no-build --configuration Release --framework net8.0
+        # NetStandardUnitTest에 대한 테스트 실행
