@@ -50,10 +50,10 @@ jobs:
     # 방법 1: 특정 프로젝트 파일들을 직접 지정하여 빌드
     - name: Build .NET 8.0 Projects (Method 1 - Specific Projects)
       run: |
-        dotnet build MyCommonNet/MyCommonNet.csproj --configuration Release
+        dotnet build CommonNetwork/MyCommonNet.csproj --configuration Release
         dotnet build NetCoreWebServer/NetCoreWebServer.csproj --configuration Release
         dotnet build TcpServerStandard/TcpServerStandard.csproj --configuration Release
-        dotnet build TestTcpClient/TestTcpClient.csproj --configuration Release
+        dotnet build TcpClientStandard/TestTcpClient.csproj --configuration Release
         dotnet build NetStandardUnitTest/NetStandardUnitTest.csproj --configuration Release
         
         # 추가 .NET 8.0 프로젝트들을 여기에 나열
