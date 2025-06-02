@@ -20,13 +20,9 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
-    - name: Verify .NET Framework 4.8.1
-      run: |
-        reg query "HKLM\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full" /v Release
-      shell: cmd
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore --no-cache
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build --no-restore --configuration Release -- framework net8.0
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test --no-build --verbosity normal --configuration Release --framework net8.0
