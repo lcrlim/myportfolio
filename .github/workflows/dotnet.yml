@@ -1,7 +1,33 @@
-# This workflow will build a .NET project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+# # This workflow will build a .NET project
+# # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
 
-name: .NET
+# name: .NET
+
+# on:
+#   push:
+#     branches: [ "master" ]
+#   pull_request:
+#     branches: [ "master" ]
+
+# jobs:
+#   build:
+
+#     runs-on: windows-latest
+
+#     steps:
+#     - uses: actions/checkout@v4
+#     - name: Setup .NET
+#       uses: actions/setup-dotnet@v4
+#       with:
+#         dotnet-version: 8.0.x
+#     - name: Restore dependencies
+#       run: dotnet restore --no-cache
+#     - name: Build
+#       run: dotnet build --no-restore --configuration Release --framework net8.0
+#     - name: Test
+#       run: dotnet test --no-build --verbosity normal --configuration Release --framework net8.0
+
+name: Build Selected .NET Projects
 
 on:
   push:
@@ -11,18 +37,38 @@ on:
 
 jobs:
   build:
-
-    runs-on: windows-latest
+    runs-on: windows-latest # Windows 환경, 필요 시 ubuntu-latest로 변경 가능
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 8.0.x
-    - name: Restore dependencies
-      run: dotnet restore --no-cache
-    - name: Build
-      run: dotnet build --no-restore --configuration Release --framework net8.0
-    - name: Test
-      run: dotnet test --no-build --verbosity normal --configuration Release --framework net8.0
+      # 1. 리포지토리 체크아웃
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. .NET SDK 8.0.x 설치
+      - name: Setup .NET 8.0.x
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x' # .NET 8.0.x SDK 설치
+
+      # 3. NuGet 패키지 복원
+      - name: Restore dependencies for NetCoreWebServer
+        run: dotnet restore TcpServerStandard/NetCoreWebServer.csproj
+        # NetCoreWebServer 프로젝트만 복원
+
+      - name: Restore dependencies for NetStandardUnitTest
+        run: dotnet restore NetStandardUnitTest/NetStandardUnitTest.csproj
+        # NetStandardUnitTest 프로젝트만 복원
+
+      # 4. .NET 프로젝트 빌드
+      - name: Build NetCoreWebServer
+        run: dotnet build TcpServerStandard/NetCoreWebServer.csproj --no-restore --configuration Release --framework net8.0
+        # NetCoreWebServer 프로젝트만 빌드
+
+      - name: Build NetStandardUnitTest
+        run: dotnet build NetStandardUnitTest/NetStandardUnitTest.csproj --no-restore --configuration Release --framework net8.0
+        # NetStandardUnitTest 프로젝트만 빌드
+
+      # 5. (선택) 테스트 실행
+      - name: Run tests for NetStandardUnitTest
+        run: dotnet test NetStandardUnitTest/NetStandardUnitTest.csproj --no-build --configuration Release --framework net8.0
+        # NetStandardUnitTest에 대한 테스트 실행 (필요 시)
