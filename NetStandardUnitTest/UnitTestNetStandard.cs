@@ -24,9 +24,9 @@ namespace NetStandardUnitTest
                 Console.WriteLine($"Connected");
                 Console.WriteLine($"Ping - Num:3, Str:test test");
                 var pong = await client.Ping(3, "test test");
-                Console.WriteLine($"Pong - Num:{pong.Num}, Str:{pong.Str}");
-                Assert.AreEqual(3, pong.Num);
-                Assert.AreEqual("test test", pong.Str);
+                Console.WriteLine($"Pong - Num:{pong?.Num}, Str:{pong?.Str}");
+                Assert.AreEqual(3, pong?.Num);
+                Assert.AreEqual("test test", pong?.Str);
             }
 
             cts.Cancel();

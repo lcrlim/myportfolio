@@ -16,7 +16,7 @@ namespace MyCommonNet
     public class TcpServer
     {
         private TcpListener? server;
-        private IPacketDispatcher dispatcher;
+        private IPacketDispatcher? dispatcher;
 
         /// <summary>
         /// 서버 시작

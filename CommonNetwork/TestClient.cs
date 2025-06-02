@@ -41,15 +41,18 @@ namespace MyCommonNet
         /// <typeparam name="T"></typeparam>
         /// <param name="req"></param>
         /// <returns></returns>
-        private async Task<T> SendAndReceive<T>(MyPacket req)
+        private async Task<T?> SendAndReceive<T>(MyPacket req)
         {
             await parser.WritePacket(req);
             MyPacket res = await parser.ReadPacket();
 
+            if (res.Body == null)
+                return default(T);
+
             return JsonConvert.DeserializeObject<T>(res.Body);
         }
 
-        public async Task<PacketPong> Ping(int pingNumber, string pingString)
+        public async Task<PacketPong?> Ping(int pingNumber, string pingString)
         {
             var req = new MyPacket
             {

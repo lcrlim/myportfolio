@@ -110,7 +110,8 @@ namespace MyCommonNet
         /// <exception cref="ArgumentOutOfRangeException">최대 패킷 길이 초과</exception>
         public virtual async Task<MyPacket> ReadPacket()
         {
-            if (GetStream() == null)
+            NetworkStream? stream = GetStream();
+            if (stream == null)
             {
                 throw new Exception("Network stream is null");
             }
@@ -120,8 +121,9 @@ namespace MyCommonNet
             Array.Clear(typeBuffer, 0, typeBuffer.Length);
 
             // 패킷의 길이 읽기
-            int readSize = await GetStream().ReadAsync(lengthBuffer, 0, lengthBuffer.Length)
+            int readSize = await stream.ReadAsync(lengthBuffer, 0, lengthBuffer.Length)
                 .ConfigureAwait(false);
+            
             if (readSize == 0)
             {
                 throw new ObjectDisposedException("network stream");
@@ -134,7 +136,7 @@ namespace MyCommonNet
             }
 
             // 패킷의 타입 읽기
-            readSize = await GetStream().ReadAsync(typeBuffer, 0, typeBuffer.Length)
+            readSize = await stream.ReadAsync(typeBuffer, 0, typeBuffer.Length)
                 .ConfigureAwait(false);
             if (readSize == 0)
             {
@@ -145,7 +147,7 @@ namespace MyCommonNet
             // 데이터 읽기
             byte[] dataBuffer = new byte[packetLength - (lengthBuffer.Length + typeBuffer.Length)];
             // 데이터 길이에서 헤더 길이를 뺌
-            readSize = await GetStream().ReadAsync(dataBuffer, 0, packetLength - (lengthBuffer.Length + typeBuffer.Length))
+            readSize = await stream.ReadAsync(dataBuffer, 0, packetLength - (lengthBuffer.Length + typeBuffer.Length))
                 .ConfigureAwait(false);
             if (readSize == 0)
             {
@@ -170,27 +172,31 @@ namespace MyCommonNet
         /// <returns></returns>
         public virtual async Task WritePacket(MyPacket packet)
         {
-            // 데이터 string이 있으면 byte로 변환
-            byte[]? resData = null;
-            if (packet.Body != null)
-                resData = Encoding.UTF8.GetBytes(packet.Body);
-
-            byte[] resBytes = new byte[GetHeaderSize() + (resData?.Length ?? 0)];
-
-            // length 바이트로
-            // 패킷 길이는 헤더사이즈 + 바디 사이즈로 설정한다.
-            packet.Len = GetHeaderSize() + (resData == null ? 0 : resData.Length);
-            BitConverter.GetBytes(packet.Len).CopyTo(resBytes, 0);
-
-            // type 바이트로
-            BitConverter.GetBytes(packet.Type).CopyTo(resBytes, GetLengthSize());
-
-            if (resData != null)
+            var stream = GetStream();
+            if (stream != null)
             {
-                Array.Copy(resData, 0, resBytes, GetHeaderSize(), resData.Length);
-            }
+                // 데이터 string이 있으면 byte로 변환
+                byte[]? resData = null;
+                if (packet.Body != null)
+                    resData = Encoding.UTF8.GetBytes(packet.Body);
 
-            await GetStream().WriteAsync(resBytes).ConfigureAwait(false);
+                byte[] resBytes = new byte[GetHeaderSize() + (resData?.Length ?? 0)];
+
+                // length 바이트로
+                // 패킷 길이는 헤더사이즈 + 바디 사이즈로 설정한다.
+                packet.Len = GetHeaderSize() + (resData == null ? 0 : resData.Length);
+                BitConverter.GetBytes(packet.Len).CopyTo(resBytes, 0);
+
+                // type 바이트로
+                BitConverter.GetBytes(packet.Type).CopyTo(resBytes, GetLengthSize());
+
+                if (resData != null)
+                {
+                    Array.Copy(resData, 0, resBytes, GetHeaderSize(), resData.Length);
+                }
+
+                await stream.WriteAsync(resBytes).ConfigureAwait(false);
+            }
         }
     }
 }

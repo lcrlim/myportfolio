@@ -45,7 +45,7 @@ public class Program
             }
         }
 
-        if (!quit)
+        if (!quit && !string.IsNullOrEmpty(ip))
         {
             using (var client = new TestClient())
             {
@@ -71,7 +71,7 @@ public class Program
                                     string pingStr = "test123";
                                     Console.WriteLine($"Ping - Num:{pingNum}, Str:{pingStr}");
                                     var pong = await client.Ping(pingNum, pingStr);
-                                    Console.WriteLine($"Pong - Num:{pong.Num}, Str:{pong.Str}");
+                                    Console.WriteLine($"Pong - Num:{pong?.Num}, Str:{pong?.Str}");
                                     break;
                                 }
                             default:

@@ -41,7 +41,7 @@ namespace TcpServerStandard
             }
             catch (Exception e)
             {
-                Log.Information($"");
+                Log.Warning($"Dispatch error - {e.Message}");
                 throw;
             }
         }
@@ -51,17 +51,26 @@ namespace TcpServerStandard
         /// </summary>
         /// <param name="packet"></param>
         /// <returns></returns>
-        public async Task<PacketPong> Ping(MyPacket packet)
+        public Task<PacketPong?> Ping(MyPacket packet)
         {
-            PacketPing? req = JsonConvert.DeserializeObject<PacketPing>(packet.Body);
-
-            Log.Logger.Information($"Packet arrived - Ping, Num:{req.Num}, Str:{req.Str}");
-            Thread.Sleep(2000);
-            return new PacketPong
+            PacketPing? req = null;
+            if (packet?.Body != null)
             {
-                Num = req.Num,
-                Str = req?.Str,
-            };
+                req = JsonConvert.DeserializeObject<PacketPing>(packet.Body);
+                if (req != null)
+                {
+                    Log.Logger.Information($"Packet arrived - Ping, Num:{req.Num}, Str:{req.Str}");
+
+                    Thread.Sleep(2000);
+                    return Task.FromResult<PacketPong?>(new PacketPong
+                    {
+                        Num = req.Num,
+                        Str = req.Str,
+                    });
+                }
+            }
+
+            return Task.FromResult<PacketPong?>(null);
         }
     }
 }
