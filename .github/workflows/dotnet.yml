@@ -37,38 +37,44 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest # Windows 환경, 필요 시 ubuntu-latest로 변경 가능
+    runs-on: windows-latest # Windows 환경
 
     steps:
       # 1. 리포지토리 체크아웃
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. .NET SDK 8.0.x 설치
+      # 2. 디렉토리 구조 확인 (디버깅용)
+      - name: List directory structure
+        run: dir
+        shell: cmd
+        # 실행 후 로그에서 프로젝트 파일 경로 확인
+
+      # 3. .NET SDK 8.0.x 설치
       - name: Setup .NET 8.0.x
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x' # .NET 8.0.x SDK 설치
 
-      # 3. NuGet 패키지 복원
+      # 4. NuGet 패키지 복원
       - name: Restore dependencies for NetCoreWebServer
-        run: dotnet restore TcpServerStandard/NetCoreWebServer.csproj
-        # NetCoreWebServer 프로젝트만 복원
+        run: dotnet restore myportfolio/TcpServerStandard/NetCoreWebServer.csproj
+        # 경로를 실제 경로로 조정
 
       - name: Restore dependencies for NetStandardUnitTest
-        run: dotnet restore NetStandardUnitTest/NetStandardUnitTest.csproj
-        # NetStandardUnitTest 프로젝트만 복원
+        run: dotnet restore myportfolio/NetStandardUnitTest/NetStandardUnitTest.csproj
+        # 경로를 실제 경로로 조정
 
-      # 4. .NET 프로젝트 빌드
+      # 5. .NET 프로젝트 빌드
       - name: Build NetCoreWebServer
-        run: dotnet build TcpServerStandard/NetCoreWebServer.csproj --no-restore --configuration Release --framework net8.0
+        run: dotnet build myportfolio/TcpServerStandard/NetCoreWebServer.csproj --no-restore --configuration Release --framework net8.0
         # NetCoreWebServer 프로젝트만 빌드
 
       - name: Build NetStandardUnitTest
-        run: dotnet build NetStandardUnitTest/NetStandardUnitTest.csproj --no-restore --configuration Release --framework net8.0
+        run: dotnet build myportfolio/NetStandardUnitTest/NetStandardUnitTest.csproj --no-restore --configuration Release --framework net8.0
         # NetStandardUnitTest 프로젝트만 빌드
 
-      # 5. (선택) 테스트 실행
+      # 6. (선택) 테스트 실행
       - name: Run tests for NetStandardUnitTest
-        run: dotnet test NetStandardUnitTest/NetStandardUnitTest.csproj --no-build --configuration Release --framework net8.0
-        # NetStandardUnitTest에 대한 테스트 실행 (필요 시)
+        run: dotnet test myportfolio/NetStandardUnitTest/NetStandardUnitTest.csproj --no-build --configuration Release --framework net8.0
+        # NetStandardUnitTest에 대한 테스트 실행
