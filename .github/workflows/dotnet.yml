@@ -37,44 +37,20 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest # Windows 환경
+    name: Build
+    runs-on: ubuntu-latest    
 
     steps:
-      # 1. 리포지토리 체크아웃
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
-      # 2. 디렉토리 구조 확인 (디버깅용)
-      - name: List directory structure
-        run: dir
-        shell: cmd
-        # 실행 후 로그에서 프로젝트 파일 경로 확인
-
-      # 3. .NET SDK 8.0.x 설치
-      - name: Setup .NET 8.0.x
-        uses: actions/setup-dotnet@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '8.0.x' # .NET 8.0.x SDK 설치
+          dotnet-version: '8.0.x'
+      
+      - name: Build solution
+        run: dotnet build -c Debug
 
-      # 4. NuGet 패키지 복원
-      - name: Restore dependencies for NetCoreWebServer
-        run: dotnet restore NetCoreWebServer.csproj
-        # 경로를 실제 경로로 조정
-
-      # 5. .NET 프로젝트 빌드
-      - name: Build NetCoreWebServer
-        run: dotnet build NetCoreWebServer.csproj --no-restore --configuration Release --framework net8.0
-        # NetCoreWebServer 프로젝트만 빌드
-
-      - name: Restore dependencies for NetStandardUnitTest
-        run: dotnet restore NetStandardUnitTest.csproj
-        # 경로를 실제 경로로 조정
-        
-      - name: Build NetStandardUnitTest
-        run: dotnet build NetStandardUnitTest.csproj --no-restore --configuration Release --framework net8.0
-        # NetStandardUnitTest 프로젝트만 빌드
-
-      # 6. (선택) 테스트 실행
-      - name: Run tests for NetStandardUnitTest
-        run: dotnet test NetStandardUnitTest.csproj --no-build --configuration Release --framework net8.0
-        # NetStandardUnitTest에 대한 테스트 실행
+      - name: Run tests
+        run: dotnet test -c Debug --no-build --no-restore
