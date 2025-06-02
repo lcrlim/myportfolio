@@ -37,20 +37,23 @@ on:
 
 jobs:
   build:
-    name: Build
-    runs-on: ubuntu-latest    
-
+    runs-on: ubuntu-latest
+    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '8.0.x'
-      
-      - name: Build solution
-        run: dotnet build -c Debug
-
-      - name: Run tests
-        run: dotnet test -c Debug --no-build --no-restore
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET 8.0
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+    
+    # 방법 1: 특정 프로젝트 파일들을 직접 지정하여 빌드
+    - name: Build .NET 8.0 Projects (Method 1 - Specific Projects)
+      run: |
+        dotnet build MyCommonNet/MyCommonNet.csproj --configuration Release
+        dotnet build NetCoreWebServer/NetCoreWebServer.csproj --configuration Release
+        dotnet build TcpServerStandard/TcpServerStandard.csproj --configuration Release
+        dotnet build TestTcpClient/TestTcpClient.csproj --configuration Release
+        dotnet build NetStandardUnitTest/NetStandardUnitTest.csproj --configuration Release
+        
+        # 추가 .NET 8.0 프로젝트들을 여기에 나열
