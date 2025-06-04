@@ -42,13 +42,13 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Setup .NET 8.0
+    - name: Setup .NET 9.0
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '8.0.x'
+        dotnet-version: '9.0.x'
     
     # 방법 1: 특정 프로젝트 파일들을 직접 지정하여 빌드
-    - name: Build .NET 8.0 Projects (Method 1 - Specific Projects)
+    - name: Build .NET 9.0 Projects (Method 1 - Specific Projects)
       run: |
         dotnet build CommonNetwork/MyCommonNet.csproj --configuration Release
         
