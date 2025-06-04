@@ -9,7 +9,8 @@ var builder = DistributedApplication.CreateBuilder(args);
 //    .WithReference(cache)
 //    .WithReference(apiService);
 
-builder.AddProject<Projects.MyAspire_Web>("webfrontend")
-    .WithExternalHttpEndpoints();
+builder.AddProject<Projects.MyAspire_Web>("web")
+    .WithExternalHttpEndpoints()
+    ;
 
 builder.Build().Run();
