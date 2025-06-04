@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace NetCoreWebServer.Controllers
 {
@@ -18,6 +19,7 @@ namespace NetCoreWebServer.Controllers
             _logger = logger;
         }
 
+        [EnableRateLimiting("fixed_100_1sec")]
         [HttpGet(Name = "GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {
