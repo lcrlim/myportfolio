@@ -51,9 +51,14 @@ jobs:
     - name: Build .NET 8.0 Projects (Method 1 - Specific Projects)
       run: |
         dotnet build CommonNetwork/MyCommonNet.csproj --configuration Release
-        dotnet build NetCoreWebServer/NetCoreWebServer.csproj --configuration Release
+        
+        dotnet build MyAspire.ServiceDefaults/MyAspire.ServiceDefaults.csproj --configuration Release
+        dotnet build MyAspire.AppHost/MyAspire.AppHost.csproj --configuration Release
+        dotnet build MyAspire.Web/MyAspire.Web.csproj --configuration Release
+
         dotnet build TcpServerStandard/TcpServerStandard.csproj --configuration Release
         dotnet build TcpClientStandard/TestTcpClient.csproj --configuration Release
+        
         dotnet build NetStandardUnitTest/NetStandardUnitTest.csproj --configuration Release
         
     - name: Test
