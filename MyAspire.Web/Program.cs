@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
 using Serilog;
 using Serilog.Events;
+using MyOpenId;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,6 +44,8 @@ builder.Services.AddRateLimiter(limiterOptions =>
         options.QueueLimit = 0; // 큐잉 비활성화 (초과 요청은 즉시 거부)
     });
 });
+
+builder.Services.AddMyOpenId(() => "connection string");
 
 var app = builder.Build();
 
