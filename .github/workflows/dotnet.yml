@@ -51,6 +51,7 @@ jobs:
     - name: Build .NET 9.0 Projects (Method 1 - Specific Projects)
       run: |
         dotnet build CommonNetwork/MyCommonNet.csproj --configuration Release
+        dotnet build MyOpenId/MyOpenId.csproj --configuration Release
         
         dotnet build MyAspire.ServiceDefaults/MyAspire.ServiceDefaults.csproj --configuration Release
         dotnet build MyAspire.AppHost/MyAspire.AppHost.csproj --configuration Release
