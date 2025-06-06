@@ -22,10 +22,12 @@ namespace MyOpenId
         {
             using (SqlConnection conn = new(connStringProvider.GetConnectionString()))
             {
+                string query = @"SELECT TOP 1 * FROM Tokens WITH(NOLOCK) WHERE TokenId = @TokenId AND Expires > GETUTCDATE();";
+
                 DynamicParameters p = new();
                 p.Add("TokenId", tokenId);
 
-                var result = await conn.QuerySingleAsync<MyAccessToken>("SpAccessTokenGet", p, commandType: CommandType.StoredProcedure);
+                var result = await conn.QuerySingleAsync<MyAccessToken>(query, p);
                 if (result == null)
                 {
                     throw new Exception($"not exists token id - {tokenId}");
@@ -53,13 +55,16 @@ namespace MyOpenId
         {
             using (SqlConnection conn = new(connStringProvider.GetConnectionString()))
             {
+                string query = @"INSERT INTO Tokens (TokenId, ClientId, Scopes, Expires, Created)
+VALUES (@TokenId, @ClientId, @Scopes, DATEADD(second, @ExpiresIn, GETUTCDATE()), GETUTCDATE());";
+
                 DynamicParameters p = new();
                 p.Add("TokenId", token.TokenId);
                 p.Add("ClientId", token.ClientId);
                 p.Add("Scopes", token.Scopes);
                 p.Add("ExpiresIn", expiresIn);
 
-                int result = await conn.ExecuteAsync("SpAccessTokenSet", p, commandType: CommandType.StoredProcedure);
+                int result = await conn.ExecuteAsync(query, p);
                 if (result == 0)
                 {
                     throw new Exception($"faild to set");

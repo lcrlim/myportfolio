@@ -1,3 +1,5 @@
+using Aspire.Hosting;
+
 var builder = DistributedApplication.CreateBuilder(args);
 
 var cache = builder.AddRedis("cache");
@@ -9,11 +11,15 @@ var cache = builder.AddRedis("cache");
 //    .WithReference(cache)
 //    .WithReference(apiService);
 
-var sql = builder.AddSqlServer("sql");
+var sql = builder.AddSqlServer("sql")
+    //.WithEnvironment("SA_PASSWORD", "YourStrong@Passw0rd123")
+    .WithDataVolume()
+    .AddDatabase("MyOpenId", "MyOpenId");
 
 builder.AddProject<Projects.MyAspire_Web>("web")
     .WithExternalHttpEndpoints()
     .WithReference(cache)
-    .WithReference(sql);
+    .WithReference(sql)
+    .WaitFor(sql);
 
 builder.Build().Run();

@@ -1,9 +1,12 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.RateLimiting;
-using System.Threading.RateLimiting;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Models;
+using MyOpenId;
 using Serilog;
 using Serilog.Events;
-using MyOpenId;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,7 +31,85 @@ builder.Host.UseSerilog();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+//builder.Services.AddSwaggerGen(options =>
+//{
+//    // Basic 인증 정의 추가
+//    options.AddSecurityDefinition("Basic", new OpenApiSecurityScheme
+//    {
+//        Name = "Authorization",
+//        Type = SecuritySchemeType.Http,
+//        Scheme = "Basic",
+//        In = ParameterLocation.Header,
+//        Description = "Enter 'Basic' followed by a space and your Base64-encoded username:password (e.g., Basic dXNlcm5hbWU6cGFzc3dvcmQ=)"
+//    });
+
+//    // API 엔드포인트에 보안 요구 사항 추가
+//    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+//    {
+//        {
+//            new OpenApiSecurityScheme
+//            {
+//                Reference = new OpenApiReference
+//                {
+//                    Type = ReferenceType.SecurityScheme,
+//                    Id = "Basic"
+//                }
+//            },
+//            new string[] { }
+//        }
+//    });
+//});
+
+builder.Services.AddSwaggerGen(options =>
+{
+    // Bearer 인증 정의
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Enter 'Bearer' followed by a space and the JWT token."
+    });
+
+    // Basic 인증 정의
+    options.AddSecurityDefinition("Basic", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Basic",
+        In = ParameterLocation.Header,
+        Description = "Enter 'Basic' followed by a space and Base64-encoded username:password (e.g., Basic dXNlcm5hbWU6cGFzc3dvcmQ=)"
+    });
+
+    // API 엔드포인트에 보안 요구 사항 추가
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] { }
+        },
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Basic"
+                }
+            },
+            new string[] { }
+        }
+    });
+});
 
 // Rate Limiter 서비스 등록
 builder.Services.AddRateLimiter(limiterOptions =>
@@ -45,7 +126,17 @@ builder.Services.AddRateLimiter(limiterOptions =>
     });
 });
 
-builder.Services.AddMyOpenId(() => "connection string");
+string? connectionString = builder.Configuration.GetConnectionString("MyOpenId");
+if (connectionString == null)
+{
+    throw new Exception("connection string is null");
+}
+
+builder.Services.AddMyOpenId(() => connectionString);
+
+builder.Services.AddDbContext<MyOpenIdDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("MyOpenId")
+     ?? throw new InvalidOperationException("Connection string 'database' not found.")));
 
 var app = builder.Build();
 
@@ -65,5 +156,23 @@ app.UseAuthorization();
 app.UseRateLimiter();
 
 app.MapControllers();
+
+
+// Initialize database and tables
+try
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var dbContext = scope.ServiceProvider.GetRequiredService<MyOpenIdDbContext>();
+        //await dbContext.Database.EnsureCreatedAsync();
+        //Log.Information("my open id database ensure success");
+        await dbContext.Database.MigrateAsync();
+        Log.Information("MyOpenId database migrate success");
+    }
+}
+catch (Exception e)
+{
+    Log.Error($"MyOpenId database migrate failed - {e.Message}");
+}
 
 app.Run();
