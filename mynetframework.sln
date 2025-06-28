@@ -3,13 +3,27 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nito.Async", "OpenSource\Nito.Async\Nito.Async.csproj", "{708763ED-7801-4F2C-B103-4FEBD771769A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nito.Async.Sockets", "OpenSource\Nito.Async.Sockets\Nito.Async.Sockets.csproj", "{B412B766-BEC2-407C-A7A1-0E5257511515}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TcpServerFramework", "TcpServerFramework\TcpServerFramework.csproj", "{28D43D73-4F9E-4DA5-A7EB-D3427190334A}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TcpServerStandard", "TcpServerStandard\TcpServerStandard.csproj", "{1E606A25-15E3-437A-AD03-901BDD97E1E9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThrottleApiServer", "ThrottleApiServer\ThrottleApiServer.csproj", "{90E513A8-14B5-4D65-B746-2B81216E36E9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utils", "Utils\Utils.csproj", "{83F64F73-C7A7-4BBE-8E92-9A481E4749DF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetStandardUnitTest", "NetStandardUnitTest\NetStandardUnitTest.csproj", "{B84ED3CA-E89F-4DB0-A335-5102FFF5968E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestTcpClient", "TcpClientStandard\TestTcpClient.csproj", "{6961A073-753F-4C64-BCE2-2F55ABBF850D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyCommonNet", "CommonNetwork\MyCommonNet.csproj", "{2DDA4956-5452-4668-B01D-9B84D3C37451}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenSource", "OpenSource", "{50BF3E6D-F3B9-4007-A394-BFFD5423BD52}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApiThrottle", "OpenSource\WebApiThrottle\WebApiThrottle.csproj", "{F049811F-BC05-4CEE-B329-CE3BF2E2E4BE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyAspire.AppHost", "MyAspire.AppHost\MyAspire.AppHost.csproj", "{8838A33C-ABD0-486E-B50A-8A4560D710AC}"
 EndProject
@@ -25,10 +39,30 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{708763ED-7801-4F2C-B103-4FEBD771769A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{708763ED-7801-4F2C-B103-4FEBD771769A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{708763ED-7801-4F2C-B103-4FEBD771769A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{708763ED-7801-4F2C-B103-4FEBD771769A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B412B766-BEC2-407C-A7A1-0E5257511515}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B412B766-BEC2-407C-A7A1-0E5257511515}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B412B766-BEC2-407C-A7A1-0E5257511515}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B412B766-BEC2-407C-A7A1-0E5257511515}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28D43D73-4F9E-4DA5-A7EB-D3427190334A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28D43D73-4F9E-4DA5-A7EB-D3427190334A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28D43D73-4F9E-4DA5-A7EB-D3427190334A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28D43D73-4F9E-4DA5-A7EB-D3427190334A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1E606A25-15E3-437A-AD03-901BDD97E1E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1E606A25-15E3-437A-AD03-901BDD97E1E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1E606A25-15E3-437A-AD03-901BDD97E1E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1E606A25-15E3-437A-AD03-901BDD97E1E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{90E513A8-14B5-4D65-B746-2B81216E36E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90E513A8-14B5-4D65-B746-2B81216E36E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90E513A8-14B5-4D65-B746-2B81216E36E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90E513A8-14B5-4D65-B746-2B81216E36E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83F64F73-C7A7-4BBE-8E92-9A481E4749DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83F64F73-C7A7-4BBE-8E92-9A481E4749DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83F64F73-C7A7-4BBE-8E92-9A481E4749DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83F64F73-C7A7-4BBE-8E92-9A481E4749DF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B84ED3CA-E89F-4DB0-A335-5102FFF5968E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B84ED3CA-E89F-4DB0-A335-5102FFF5968E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B84ED3CA-E89F-4DB0-A335-5102FFF5968E}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -41,6 +75,10 @@ Global
 		{2DDA4956-5452-4668-B01D-9B84D3C37451}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2DDA4956-5452-4668-B01D-9B84D3C37451}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2DDA4956-5452-4668-B01D-9B84D3C37451}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F049811F-BC05-4CEE-B329-CE3BF2E2E4BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F049811F-BC05-4CEE-B329-CE3BF2E2E4BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F049811F-BC05-4CEE-B329-CE3BF2E2E4BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F049811F-BC05-4CEE-B329-CE3BF2E2E4BE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8838A33C-ABD0-486E-B50A-8A4560D710AC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8838A33C-ABD0-486E-B50A-8A4560D710AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8838A33C-ABD0-486E-B50A-8A4560D710AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -60,6 +98,11 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{708763ED-7801-4F2C-B103-4FEBD771769A} = {50BF3E6D-F3B9-4007-A394-BFFD5423BD52}
+		{B412B766-BEC2-407C-A7A1-0E5257511515} = {50BF3E6D-F3B9-4007-A394-BFFD5423BD52}
+		{F049811F-BC05-4CEE-B329-CE3BF2E2E4BE} = {50BF3E6D-F3B9-4007-A394-BFFD5423BD52}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {08B61B31-C2D9-422B-8F44-43CEA6B35DEC}
