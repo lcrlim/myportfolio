@@ -47,7 +47,7 @@ jobs:
       with:
         dotnet-version: '9.0.x'
     
-    # ¹æ¹ı 1: Æ¯Á¤ ÇÁ·ÎÁ§Æ® ÆÄÀÏµéÀ» Á÷Á¢ ÁöÁ¤ÇÏ¿© ºôµå
+    # ë°©ë²• 1: íŠ¹ì • í”„ë¡œì íŠ¸ íŒŒì¼ë“¤ì„ ì§ì ‘ ì§€ì •í•˜ì—¬ ë¹Œë“œ
     - name: Build .NET 9.0 Projects (Method 1 - Specific Projects)
       run: |
         dotnet build CommonNetwork/MyCommonNet.csproj --configuration Release
@@ -63,4 +63,4 @@ jobs:
         dotnet build NetStandardUnitTest/NetStandardUnitTest.csproj --configuration Release
         
     - name: Test
-      run: dotnet test --no-build --verbosity normal --configuration Release
+      run: dotnet test --verbosity normal --configuration Release
