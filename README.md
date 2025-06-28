@@ -1,5 +1,5 @@
 개인 학습과 포트폴리오를 위한 샘플 코드 프로젝트 입니다.
-.NET Core를 사용하는 TCP 서버 Prototype과 기타 코드의 모음입니다.
+.NET Core를 사용하는 TCP 서버 Prototype 입니다.
   
 # Projects
 
@@ -26,15 +26,7 @@
     - [ ] 성능 테스트 케이스 구현하여 초당 몇 개의 요청을 처리할 수 있는지 체크해 보자.
 <br/>
       
-# ThrottleApiServer
 
-  - .NET Framework 4.8.1 기반의 Throtting 설정이 가능한 웹 서비스 프로젝트이다.
-  - Owin Self-Hosing 서버 API에 Throttling을 적용하기위해 오픈 소스(WebApiThrottle)를 사용하고, 데이터 저장소를 기본(Redis)이 아닌 MSSQL로 사용하도록 코드를 구현한다.
-  - Features
-    - [x] 현재는 PerSecond or PerMinute or PerHour 등의 1가지 속성만 적용할 수 있고, 여러 요소를 동시에 적용하기 위해서는 일부 코드 수정 필요
-    - [x] IP address 당 제한 / Endpoint 당 제한 / Client 식별자 당 제한 등을 사용할 수 있고, whilelist 등의 기능도 설정 할 수 있다.
-    - [x] 제한 설정은 Controller 전체에 또는 API당 제한 값을 다르게 설정할 수 있다.
-<br/>
    
 # My.Aspire.Web
 
