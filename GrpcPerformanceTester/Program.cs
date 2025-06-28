@@ -9,20 +9,40 @@ namespace GrpcClient
         static async Task Main(string[] args)
         {
             // Configure gRPC channel with increased connection limits
+            //var channelOptions = new GrpcChannelOptions
+            //{
+            //    MaxReceiveMessageSize = null, // No limit on message size
+            //    MaxSendMessageSize = null,
+            //    HttpHandler = new SocketsHttpHandler
+            //    {
+            //        PooledConnectionIdleTimeout = Timeout.InfiniteTimeSpan,
+            //        KeepAlivePingDelay = TimeSpan.FromSeconds(60),
+            //        KeepAlivePingTimeout = TimeSpan.FromSeconds(30),
+            //        EnableMultipleHttp2Connections = true
+            //    }
+            //};
+
+            //using var channel = GrpcChannel.ForAddress("http://localhost:5000", channelOptions);
+
             var channelOptions = new GrpcChannelOptions
             {
-                MaxReceiveMessageSize = null, // No limit on message size
+                MaxReceiveMessageSize = null,
                 MaxSendMessageSize = null,
                 HttpHandler = new SocketsHttpHandler
                 {
                     PooledConnectionIdleTimeout = Timeout.InfiniteTimeSpan,
                     KeepAlivePingDelay = TimeSpan.FromSeconds(60),
                     KeepAlivePingTimeout = TimeSpan.FromSeconds(30),
-                    EnableMultipleHttp2Connections = true
+                    EnableMultipleHttp2Connections = true,
+                    SslOptions = new System.Net.Security.SslClientAuthenticationOptions
+                    {
+                        RemoteCertificateValidationCallback = (sender, cert, chain, errors) => true // 테스트용
+                    }
                 }
             };
 
-            using var channel = GrpcChannel.ForAddress("http://localhost:5000", channelOptions);
+            using var channel = GrpcChannel.ForAddress("https://localhost:5000", channelOptions);
+
             var client = new Greeter.GreeterClient(channel);
 
             // Run performance test with 100,000 requests, 1,000 per batch

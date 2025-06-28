@@ -1,33 +1,4 @@
-# # This workflow will build a .NET project
-# # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
-
-# name: .NET
-
-# on:
-#   push:
-#     branches: [ "master" ]
-#   pull_request:
-#     branches: [ "master" ]
-
-# jobs:
-#   build:
-
-#     runs-on: windows-latest
-
-#     steps:
-#     - uses: actions/checkout@v4
-#     - name: Setup .NET
-#       uses: actions/setup-dotnet@v4
-#       with:
-#         dotnet-version: 8.0.x
-#     - name: Restore dependencies
-#       run: dotnet restore --no-cache
-#     - name: Build
-#       run: dotnet build --no-restore --configuration Release --framework net8.0
-#     - name: Test
-#       run: dotnet test --no-build --verbosity normal --configuration Release --framework net8.0
-
-name: Build Selected .NET Projects
+name: Build All .NET Projects (No Solution File)
 
 on:
   push:
@@ -47,20 +18,28 @@ jobs:
       with:
         dotnet-version: '9.0.x'
     
-    # 방법 1: 특정 프로젝트 파일들을 직접 지정하여 빌드
-    - name: Build .NET 9.0 Projects (Method 1 - Specific Projects)
+    - name: Restore All Projects
       run: |
-        dotnet build CommonNetwork/MyCommonNet.csproj --configuration Release
-        dotnet build MyOpenId/MyOpenId.csproj --configuration Release
-        
-        dotnet build MyAspire.ServiceDefaults/MyAspire.ServiceDefaults.csproj --configuration Release
-        dotnet build MyAspire.AppHost/MyAspire.AppHost.csproj --configuration Release
-        dotnet build MyAspire.Web/MyAspire.Web.csproj --configuration Release
-
-        dotnet build TcpServerStandard/TcpServerStandard.csproj --configuration Release
-        dotnet build TcpClientStandard/TestTcpClient.csproj --configuration Release
-        
-        dotnet build NetStandardUnitTest/NetStandardUnitTest.csproj --configuration Release
-        
-    - name: Test
-      run: dotnet test --no-build --verbosity normal --configuration Release
+        Get-ChildItem -Recurse -Filter "*.csproj" | ForEach-Object {
+          Write-Host "Restoring: $($_.Name)"
+          dotnet restore $_.FullName
+        }
+      shell: pwsh
+    
+    - name: Build All Projects
+      run: |
+        Get-ChildItem -Recurse -Filter "*.csproj" | ForEach-Object {
+          Write-Host "Building: $($_.Name)"
+          dotnet build $_.FullName --configuration Release --no-restore
+        }
+      shell: pwsh
+    
+    - name: Test All Projects
+      run: |
+        Get-ChildItem -Recurse -Filter "*.csproj" | Where-Object { 
+          $_.Name -like "*Test*" -or $_.Name -like "*test*" 
+        } | ForEach-Object {
+          Write-Host "Testing: $($_.Name)"
+          dotnet test $_.FullName --configuration Release --no-build --verbosity normal
+        }
+      shell: pwsh
