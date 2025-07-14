@@ -28,12 +28,13 @@
       
 
    
-# My.Aspire.Web
+# Web.Service
 
    - .NET 9기반의 .NET Aspire 또는 단독 실행할 수 있는 웹 API 서비스이다.
-   - .NET Aspire는 .NET 8부터 나온 기능으로 docker 등의 Container 기반으로 .net 애플리케이션을 구성할 수 있는 오케스트레이션 기능이다.
-   - 해당 웹 서비스 프로젝트는 .NET Core 기반의 REST API 서비스를 기본틀을 구현하는데 목적이 있고, 아래의 기능을 선택적으로 사용할 수 있도록 제공할 예정이다.
+   - .NET Aspire는 docker 등의 Container 기반으로 .net 애플리케이션을 구성할 수 있는 오케스트레이션 기능이다.
+   - 해당 웹 서비스 프로젝트는 .NET Core 기반의 REST API 서비스를 기본틀을 구현하는데 목적이 있고, 아래의 기능을 선택적으로 사용할 수 있도록 제공한다.
    - Features
-     - [x] Microsoft의 RateLimiter를 적용해 API Throttling을 가능케하고, Redis를 사용하여 분산 환경에서도 Throttling Count를 공유할 수 있도록 한다.
-     - [x] OIDC(Open Id Connect)를 간이로 구현하여 API 인증을 위한 Access token을 생성, 조회, 검증할 수 있다. 
+     - [x] Microsoft의 RateLimiter를 적용해 API Throttling을 가능케하고, Redis를 사용하여 분산 환경에서도 Throttling Count를 공유할 수 있도록 한다. (Redis 사용시 추가 코딩 필요)
+     - [x] OIDC(Open Id Connect)를 간이로 구현하여 API 인증을 위한 Access token을 생성, 조회, 검증할 수 있다.
+     - [x] Swagger를 적용해 api 명세를 제공한다.
 <br/>
