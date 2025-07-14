@@ -10,9 +10,6 @@ using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.AddServiceDefaults();
-
 // Serilog 설정
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
@@ -126,7 +123,7 @@ builder.Services.AddRateLimiter(limiterOptions =>
     });
 });
 
-string? connectionString = builder.Configuration.GetConnectionString("MyOpenId");
+string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 if (connectionString == null)
 {
     throw new Exception("connection string is null");
@@ -135,18 +132,27 @@ if (connectionString == null)
 builder.Services.AddMyOpenId(() => connectionString);
 
 builder.Services.AddDbContext<MyOpenIdDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("MyOpenId")
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")
      ?? throw new InvalidOperationException("Connection string 'database' not found.")));
 
 var app = builder.Build();
 
 app.UseSerilogRequestLogging();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+// 환경 변수로 Swagger 활성화 제어
+var enableSwagger = app.Configuration.GetValue<bool>("ENABLE_SWAGGER") ||
+                   app.Environment.IsDevelopment();
+
+if (enableSwagger)
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Web Service API V1");
+        c.RoutePrefix = "swagger";
+    });
+
+    Log.Information("Enable swagger");
 }
 
 app.UseHttpsRedirection();
