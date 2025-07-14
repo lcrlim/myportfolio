@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MyAspire.ServiceDefaults\MyAspire.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\Aspire.ServiceDefaults\Aspire.ServiceDefaults.csproj" />
     <ProjectReference Include="..\MyOpenId\MyOpenId.csproj" />
   </ItemGroup>
 

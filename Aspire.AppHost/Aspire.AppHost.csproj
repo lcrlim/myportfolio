@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <Sdk Name="Aspire.AppHost.Sdk" Version="9.3.0" />
 
@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MyAspire.Web\MyAspire.Web.csproj" />
+    <ProjectReference Include="..\Web.Service\Web.Service.csproj" />
   </ItemGroup>
 
 </Project>
