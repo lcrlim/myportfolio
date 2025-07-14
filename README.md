@@ -36,5 +36,14 @@
    - Features
      - [x] Microsoft의 RateLimiter를 적용해 API Throttling을 가능케하고, Redis를 사용하여 분산 환경에서도 Throttling Count를 공유할 수 있도록 한다. (Redis 사용시 추가 코딩 필요)
      - [x] OIDC(Open Id Connect)를 간이로 구현하여 API 인증을 위한 Access token을 생성, 조회, 검증할 수 있다.
-     - [x] Swagger를 적용해 api 명세를 제공한다.
+     - [x] Swagger를 적용해 api 명세를 제공한다. 
+   - 실행 방법
+     - Docker Desktop 설치 및 실행 (필수, 윈도우즈 환경에서 실행 가정)
+     - Visual Stuido 2022에서 솔루션 전체 빌드
+     - Aspire.AppHost 프로젝트 실행
+     - 실행 완료 후 My.Web.http 파일로 테스트 호출
+     - 또는 Aspire.Dashboard에서 swagger페이지 접속 후 테스트 호출 가능
+    <img width="2420" height="674" alt="image" src="https://github.com/user-attachments/assets/a631bb26-7a8b-42ba-8f0b-8eb918423a0a" />
+     - Swagger에서 보이는 Token Controller에서 토큰 발행 하여 Header에 세팅 후 사용 가능
+    <img width="2900" height="1508" alt="image" src="https://github.com/user-attachments/assets/dd6a3b31-4d22-49e2-b344-7db796fa0a2c" />
 <br/>
