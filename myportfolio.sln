@@ -13,11 +13,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyCommonNet", "CommonNetwor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyOpenId", "MyOpenId\MyOpenId.csproj", "{B79CB69F-D9DC-4284-A744-D7B867FB4959}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GrpcService", "GrpcService\GrpcService.csproj", "{AA25027F-457C-4566-A50E-15654C86F955}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gRPCServer", "GrpcService\gRPCServer.csproj", "{AA25027F-457C-4566-A50E-15654C86F955}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GrpcClient", "GrpcClient\GrpcClient.csproj", "{ADC8A359-B987-4BDD-971C-CEEEA670234D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gRPCClient", "GrpcClient\gRPCClient.csproj", "{ADC8A359-B987-4BDD-971C-CEEEA670234D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GrpcPerformanceTester", "GrpcPerformanceTester\GrpcPerformanceTester.csproj", "{971D5732-19AD-4BD0-B8F3-3967849E4A76}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gRPCPerformanceTester", "GrpcPerformanceTester\gRPCPerformanceTester.csproj", "{971D5732-19AD-4BD0-B8F3-3967849E4A76}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web.Service", "Web.Service\Web.Service.csproj", "{9E02CFFC-478C-122D-7967-EDD1E46AC269}"
 EndProject
