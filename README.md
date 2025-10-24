@@ -30,20 +30,17 @@
    
 # Web.Service
 
-   - .NET 9기반의 .NET Aspire 또는 단독 실행할 수 있는 웹 API 서비스이다.
-   - .NET Aspire는 docker 등의 Container 기반으로 .net 애플리케이션을 구성할 수 있는 오케스트레이션 기능이다.
    - 해당 웹 서비스 프로젝트는 .NET Core 기반의 REST API 서비스를 기본틀을 구현하는데 목적이 있고, 아래의 기능을 선택적으로 사용할 수 있도록 제공한다.
    - Features
      - [x] Microsoft의 RateLimiter를 적용해 API Throttling을 가능케하고, Redis를 사용하여 분산 환경에서도 Throttling Count를 공유할 수 있도록 한다. (Redis 사용시 추가 코딩 필요)
      - [x] OIDC(Open Id Connect)를 간이로 구현하여 API 인증을 위한 Access token을 생성, 조회, 검증할 수 있다.
      - [x] Swagger를 적용해 api 명세를 제공한다. 
    - 실행 방법
-     - Docker Desktop 설치 및 실행 (필수, 윈도우즈 환경에서 실행 가정)
+     - Sql server 필요
      - Visual Stuido 2022에서 솔루션 전체 빌드
-     - Aspire.AppHost 프로젝트 실행       
-     - 실행 완료 후 My.Web.http 파일로 테스트 호출 또는 Aspire.Dashboard에서 swagger페이지 접속 후 테스트 호출 가능       
-    <img width="2420" height="674" alt="image" src="https://github.com/user-attachments/assets/a631bb26-7a8b-42ba-8f0b-8eb918423a0a" />
-
+     - Web.Service의 appsettings.json에 sql server 정보 입력
+     - Web.Service 실행
+     - 실행 완료 후 My.Web.http 파일로 테스트 호출 또는 Swagger 페이지 접속 후 호출 가능
      - Swagger에서 보이는 Token Controller에서 토큰 발행 하여 Header에 세팅 후 사용 가능
     <img width="2878" height="1378" alt="image" src="https://github.com/user-attachments/assets/bf564c84-3194-428d-8056-01861ad28373" />
 
