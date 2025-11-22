@@ -45,3 +45,15 @@
     <img width="2878" height="1378" alt="image" src="https://github.com/user-attachments/assets/bf564c84-3194-428d-8056-01861ad28373" />
 
 <br/>
+
+
+# gRPC Client / Server / Tester
+
+   - gRPC를 사용한 간단한 통신 샘플 코드와 성능 측정을 위한 Tester      
+   - 테스트 방법
+     - gRPC Server 실행
+     - gRPCPerformanceTester.exe 실행
+     - 테스트 결과 샘플
+       <img width="852" height="330" alt="image" src="https://github.com/user-attachments/assets/b3af18ae-dff5-4097-ba5a-29c75c4989dc" />
+
+     
