@@ -1,0 +1,74 @@
+syntax = "proto3";
+
+package game;
+
+// 게임 서비스 정의
+service GameService {
+  // 단방향 RPC
+  rpc Login(LoginRequest) returns (LoginResponse);
+  rpc Logout(LogoutRequest) returns (LogoutResponse);
+  
+  // 양방향 스트리밍 (실시간 게임 데이터)
+  rpc GameStream(stream GameMessage) returns (stream GameMessage);
+}
+
+// 로그인 요청
+message LoginRequest {
+  string username = 1;
+  string password = 2;
+  string client_version = 3;
+  int64 timestamp = 4;
+}
+
+// 로그인 응답
+message LoginResponse {
+  enum ResultCode {
+    SUCCESS = 0;
+    INVALID_CREDENTIALS = 1;
+    SERVER_FULL = 2;
+    ALREADY_LOGGED_IN = 3;
+    MAINTENANCE = 4;
+    BANNED = 5;
+  }
+  
+  ResultCode result = 1;
+  string message = 2;
+  string session_token = 3;
+  int64 user_id = 4;
+  int64 timestamp = 5;
+}
+
+// 로그아웃 요청
+message LogoutRequest {
+  string session_token = 1;
+  int64 user_id = 2;
+  int64 timestamp = 3;
+}
+
+// 로그아웃 응답
+message LogoutResponse {
+  enum ResultCode {
+    SUCCESS = 0;
+    INVALID_SESSION = 1;
+    NOT_LOGGED_IN = 2;
+  }
+  
+  ResultCode result = 1;
+  string message = 2;
+  int64 timestamp = 3;
+}
+
+// 게임 메시지 (스트리밍용)
+message GameMessage {
+  enum MessageType {
+    HEARTBEAT = 0;
+    PLAYER_MOVE = 1;
+    PLAYER_ATTACK = 2;
+    CHAT = 3;
+  }
+  
+  MessageType type = 1;
+  int64 user_id = 2;
+  bytes payload = 3;
+  int64 timestamp = 4;
+}
