@@ -11,14 +11,20 @@
 
 ## Overview
 
-이 프로젝트는 **.NET Core**를 기반으로 서버 애플리케이션을 구현한 포트폴리오입니다.
-단순한 기능 구현을 넘어, **비동기 네트워크 처리(TAP)**, **분산 시스템의 트래픽 제어(Rate Limiting)**, **표준 인증 프로토콜(OIDC)** 등 기술적 요구사항 구현을 추가하였습니다.
+이 프로젝트는 **.NET Core**를 기반으로 
+- TCP 소켓 서버 애플리케이션과 Rest API 서버를 구현한 포트폴리오입니다.
+- TCP 소켓 서버는 **비동기 네트워크 처리(TAP)** 방식으로 패킷을 추가할 때 유지보수성을 높게 하기 위해 Reflection을 적용하여 Handler를 찾아 매핑을 구성합니다.
+  - 패킷이 추가될 때 사용자는 아래의 2가지 행위만 구현합니다.
+    - PacketType 및 패킷 클래스 정의
+    - 패킷을 처리 로직이 구현된 Handler 클래스 구현
+- Rest API 서버는 **분산 시스템의 트래픽 제어(Rate Limiting)**, **표준 인증 프로토콜(OIDC)** 등 기술적 요구사항 구현을 추가하였고, **Swagger**를 통한 문서를 제공합니다.
 
-### Key Objectives
-- **High Concurrency**: Task 기반 비동기 패턴(TAP)을 활용한 Non-blocking I/O 처리로 대규모 동시 접속 처리.
-- **Microservice Ready**: gRPC 및 REST API를 통한 서비스 간 고속 통신 및 확장성 확보.
-- **Reliability & Security**: API Throttling을 통한 과부하 방지 및 OIDC 기반의 인증 체계 구축.
-- **Clean Architecture**: 네트워크 모듈의 추상화와 의존성 주입(DI)을 통한 유지보수성 향상.
+### 주요 목표
+- TCP Server
+  - **High Concurrency**: Task 기반 비동기 패턴(TAP)을 활용한 Non-blocking I/O 처리로 대규모 동시 접속 처리.
+  - **Maintenance**: 패킷 추가시 Dispatcher를 수정하지 않고 추가되는 패킷의 처리 로직만 구현하면 되도록 구현.
+- Rest API Server
+  - **Reliability & Security**: API Throttling을 통한 과부하 방지 및 OIDC 기반의 인증 체계 구축.
 
 ---
 
@@ -41,16 +47,19 @@
 
 ```bash
 lcrlim-myportfolio/
-├── CommonNetwork         # [Core] 네트워크 공통 라이브러리 (Packet, Parser Interface)
+├── MyCommonNet           # [Core] 네트워크 공통 라이브러리 (Packet, Parser Interface, Dispatcher)
 ├── TcpServerStandard     # [Server] Async TCP 서버 구현체 (TAP Pattern)
-├── Web.Service           # [API] RESTful API 서비스 (RateLimit, OIDC, Swagger)
-├── GrpcServer            # [gRPC] gRPC 서버 (C#)
-├── GrpcClient            # [gRPC] gRPC 클라이언트
-├── GrpcPerformanceTester # [Tool] gRPC 성능/부하 테스트 도구
-├── grpcserver-cpp        # [gRPC] C++ 기반 gRPC 서버 (상호운용성 데모)
-├── MyOpenId              # [Auth] OIDC 기반 인증 서버 구현
+├── TestTcpClient         # [Client] TcpServerStandard를 테스트 하기 위한 테스트 클라이언트
 ├── NetStandardUnitTest   # [Test] 단위 테스트 프로젝트
-└── Aspire.*              # [Cloud] .NET Aspire 오케스트레이션 설정
+
+├── Web.Service           # [API] RESTful API 서비스 (RateLimit, OIDC, Swagger)
+├── MyOpenId              # [Auth] OIDC 기반 인증 서버 구현
+
+├── GrpcServer            # [gRPC] gRPC 서버 (C#)
+├── GrpcClient            # [gRPC] gRPC 클라이언트 (C#)
+├── GrpcPerformanceTester # [Tool] gRPC 성능/부하 테스트 도구 (C#)
+
+├── grpcserver-cpp        # [gRPC] C++ 기반 gRPC 서버
 ```
 
 ---
@@ -70,7 +79,7 @@ lcrlim-myportfolio/
 git clone [https://github.com/lcrlim/myportfolio.git](https://github.com/lcrlim/myportfolio.git)
 cd myportfolio
 dotnet restore
-dotnet build
+dotnet build .\myportfolio.sln
 ```
 ### 데이터베이스 설정
 Web.Service 프로젝트 실행을 위해 데이터베이스 연결 문자열을 설정해야 합니다.
@@ -86,9 +95,22 @@ Web.Service 프로젝트 실행을 위해 데이터베이스 연결 문자열을
 ---
 
 ### 실행 방법
-A. Run Web Service (REST API)
-  - API 서버를 실행하고 Swagger를 통해 테스트합니다.
 
+A. Run TCP Server
+  - 비동기 TCP서버와 테스트 클라이언트를 실행합니다.  
+```bash
+cd TcpServerStandard
+dotnet run
+
+# 새 터미널:
+cd TcpClientStandard
+dotnet run
+```
+  - 서버가 시작되면 Program.cs에 고정된 포트(기본값:8888)로 클라이언트 연결을 대기합니다.
+  - 테스트 클라이언트를 실행하면 IP와 Port를 입력하고 help, ping, login 등을 테스트 할 수 있습니다.
+    
+B. Run Web Service (REST API)
+  - API 서버를 실행하고 Swagger를 통해 테스트합니다.
 ```bash
 cd Web.Service
 dotnet run
@@ -96,15 +118,7 @@ dotnet run
   - Access: 브라우저에서 http://localhost:5000/swagger (포트는 설정에 따라 다름) 접속
   - Features: Token 발급, API Throttling 테스트 가능
 
-B. Run TCP Server
-  - 고성능 비동기 소켓 서버를 실행합니다.
-```bash
-cd TcpServerStandard
-dotnet run
-```
-  - 서버가 시작되면 CommonNetwork에 정의된 포트(기본값)로 클라이언트 연결을 대기합니다.
-
-C. Run gRPC Server & Tester
+C. Run gRPC Server & Tester (C#)
   - gRPC 통신 성능을 측정합니다.
 1. Server 실행:
 ```bash
@@ -118,6 +132,50 @@ dotnet run
 ```
   - 테스트 결과로 초당 처리량(TPS)과 응답 지연 시간(Latency)이 콘솔에 출력됩니다.
 
+D. Run gRPC Sever & Tester (C++)
+  - gRPC를 구현한 C++ 서버를 실행하고 성능을 측정합니다.
+1. Server 실행:
+```bash
+cd grpcserver-cpp
+# cmake 설치 안되어 있으면 설치
+winget install Kitware.CMake
+# 또는
+choco install cmake
+# D:\work\Dev\vcpkg 경로에 vcpkg 설치되어 있다는 가정하에 아래 스크립트 실행
+# 설치된 경로가 다름 build.ps1 파일 내부에 VcpkgPaths 수정
+.\build.ps1
+
+[SUCCESS] Build completed successfully!
+[INFO] Verifying build output...
+[SUCCESS] ✓ generated\game.pb.h
+[SUCCESS] ✓ generated\game.pb.cc
+[SUCCESS] ✓ generated\game.grpc.pb.h
+[SUCCESS] ✓ generated\game.grpc.pb.cc
+[SUCCESS] ✓ Release\game_server.exe
+[SUCCESS] ✓ Release\test_client.exe
+
+[SUCCESS] ==========================================
+[SUCCESS] Build completed successfully!
+[SUCCESS] ==========================================
+
+[INFO] To run the server:
+  cd build\Release
+  .\game_server.exe
+
+[INFO] To run the test client (in another terminal):
+  cd build\Release
+  .\test_client.exe localhost:50051 single
+  .\test_client.exe localhost:50051 load 1000 60
+
+# 서버 실행
+.\game_server.exe
+```
+2. Tester 실행 (새 터미널):
+```bash
+.\test_client.exe localhost:50051 single
+# 또는
+.\test_client.exe localhost:50051 load 1000 60
+```
 ---
 
 ### 테스트
