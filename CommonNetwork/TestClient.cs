@@ -56,7 +56,7 @@ namespace MyCommonNet
         {
             var req = new MyPacket
             {
-                Type = (int)Packet.Type.PING,
+                Type = (int)Packet.PacketType.PING,
                 Body = JsonConvert.SerializeObject(new PacketPing
                 {
                     Num = pingNumber,
@@ -66,6 +66,21 @@ namespace MyCommonNet
             req.Len = Packet.PACKET_HEADER_SIZE + req.Body.Length;
 
             return await SendAndReceive<PacketPong>(req);
+        }
+
+        public async Task<PacketLoginResult?> Login(string userId)
+        {
+            var req = new MyPacket
+            {
+                Type = (int)Packet.PacketType.LOGIN,
+                Body = JsonConvert.SerializeObject(new PacketLogin
+                {
+                    UserId = userId
+                })
+            };
+            req.Len = Packet.PACKET_HEADER_SIZE + req.Body.Length;
+
+            return await SendAndReceive<PacketLoginResult>(req);
         }
 
         public void Dispose()

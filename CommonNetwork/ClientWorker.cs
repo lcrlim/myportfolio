@@ -44,7 +44,7 @@ namespace MyCommonNet
                         MyPacket req = await parser.ReadPacket().ConfigureAwait(false);
 
                         // 여기서 데이터를 원하는 형태로 파싱하고 처리합니다.
-                        MyPacket? res = await this.dispatcher.Dispatch(req).ConfigureAwait(false);
+                        MyPacket? res = await this.dispatcher.DispatchAsync(req).ConfigureAwait(false);
                         if (res != null)
                         {
                             await parser.WritePacket(res).ConfigureAwait(false);
