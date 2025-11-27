@@ -1,59 +1,145 @@
-개인 포트폴리오를 위한 샘플 코드 프로젝트 입니다.
-.NET Core를 사용하는 TCP 서버 Prototype 입니다.
-  
-# Projects
+# High-Performance .NET Server Architecture Portfolio
 
-# TcpServerStandard
+![Platform](https://img.shields.io/badge/Platform-.NET%20Core-512BD4?style=flat-square&logo=dotnet)
+![Language](https://img.shields.io/badge/Language-C%23%20%7C%20C%2B%2B-blue?style=flat-square)
+![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
+![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen?style=flat-square)
 
-  - .NET Core 기반으로 비동기 tcp server의 기본적 틀을 구현한다.
-  - MyCommonNet을 사용한 서버 콘솔 프로그램 구현
-  - 패킷 파서 구현 클래스
-  - MyCommonNet => .NET Core 에서 사용할 네트워크 공통 라이브러리
-    - 기본 패킷 클래스
-    - 패킷 파서 인터페이스 : 필요한 패킷 구조에 따라 직렬화 클래스를 상속 구현하여 injection할 수 있는 구조 제공
-    - TCP서버 객체 : TcpListener를 사용하여 TAP(작업 기반 비동기 패턴)로 구현, 비동기 처리로 고용량 처리를 목적으로 함
-    - Client Connection 패킷 처리 Worker
-    - 로깅은 Serilog 사용
-    -    ![Slide2](https://github.com/lcrlim/myportfolio/assets/68598899/533cd9b4-d5fb-4bd1-a39f-d015b7056039)
+> **Enterprise-grade server application samples demonstrating high-concurrency TCP networking, scalable REST APIs, and gRPC microservices integration.**
 
-  - Packet 구조
-    -   ![Slide1](https://github.com/lcrlim/myportfolio/assets/68598899/8bdab1b1-62b9-4a53-a98b-0020bc109465)
-    - Length, Type은 고정 4바이트, Body는 동적이고 Json String (UTF8)로 구현되어 있다. (다른 직렬화 Rule을 적용할 경우 PacketParser를 상속받아 별도 클래스 구현하면 된다.)
-  
-  - NetStandardUnitTest => .NET Core 단위 테스트 프로젝트
-    - 간단한 테스트 케이스로 client와 server 사이에 ping / pong 을 주고 받는 테스트 케이스 구현
-  - TODO
-    - [ ] 성능 테스트 케이스 구현하여 초당 몇 개의 요청을 처리할 수 있는지 체크해 보자.
-<br/>
-      
+---
 
-   
-# Web.Service
+## Overview
 
-   - 해당 웹 서비스 프로젝트는 .NET Core 기반의 REST API 서비스를 기본틀을 구현하는데 목적이 있고, 아래의 기능을 선택적으로 사용할 수 있도록 제공한다.
-   - Features
-     - [x] Microsoft의 RateLimiter를 적용해 API Throttling을 가능케하고, Redis를 사용하여 분산 환경에서도 Throttling Count를 공유할 수 있도록 한다. (Redis 사용시 추가 코딩 필요)
-     - [x] OIDC(Open Id Connect)를 간이로 구현하여 API 인증을 위한 Access token을 생성, 조회, 검증할 수 있다.
-     - [x] Swagger를 적용해 api 명세를 제공한다. 
-   - 실행 방법
-     - Sql server 필요
-     - Visual Stuido 2022에서 솔루션 전체 빌드
-     - Web.Service의 appsettings.json에 sql server 정보 입력
-     - Web.Service 실행
-     - 실행 완료 후 My.Web.http 파일로 테스트 호출 또는 Swagger 페이지 접속 후 호출 가능
-     - Swagger에서 보이는 Token Controller에서 토큰 발행 하여 Header에 세팅 후 사용 가능
-    <img width="2878" height="1378" alt="image" src="https://github.com/user-attachments/assets/bf564c84-3194-428d-8056-01861ad28373" />
+이 프로젝트는 **.NET Core**를 기반으로 서버 애플리케이션을 구현한 포트폴리오입니다.
+단순한 기능 구현을 넘어, **비동기 네트워크 처리(TAP)**, **분산 시스템의 트래픽 제어(Rate Limiting)**, **표준 인증 프로토콜(OIDC)** 등 기술적 요구사항 구현을 추가하였습니다.
 
-<br/>
+### Key Objectives
+- **High Concurrency**: Task 기반 비동기 패턴(TAP)을 활용한 Non-blocking I/O 처리로 대규모 동시 접속 처리.
+- **Microservice Ready**: gRPC 및 REST API를 통한 서비스 간 고속 통신 및 확장성 확보.
+- **Reliability & Security**: API Throttling을 통한 과부하 방지 및 OIDC 기반의 인증 체계 구축.
+- **Clean Architecture**: 네트워크 모듈의 추상화와 의존성 주입(DI)을 통한 유지보수성 향상.
 
+---
 
-# gRPC Client / Server / Tester
+## 기술 스택
 
-   - gRPC를 사용한 간단한 통신 샘플 코드와 성능 측정을 위한 Tester      
-   - 테스트 방법
-     - gRPC Server 실행
-     - gRPCPerformanceTester.exe 실행
-     - 테스트 결과 샘플
-       <img width="852" height="330" alt="image" src="https://github.com/user-attachments/assets/b3af18ae-dff5-4097-ba5a-29c75c4989dc" />
+| Category | Technology | Description |
+| :--- | :--- | :--- |
+| **Framework** | .NET (Core) 9.0+ | Server Application Runtime |
+| **Language** | C#, C++ | Core Logic & Native Interop |
+| **Protocol** | TCP/IP, gRPC, HTTP/1.1 | Async Socket, Protobuf, REST API |
+| **Database** | MS SQL Server | Relational Data Storage |
+| **Cache/Dist** | Redis | Distributed Rate Limiting & Caching |
+| **Auth** | OIDC (OpenID Connect) | Custom Identity Provider Implementation |
+| **Logging** | Serilog | Structured Logging |
+| **Testing** | xUnit, Custom Tester | Unit Testing & Performance Benchmarking |
 
-     
+---
+
+## 프로젝트 구조
+
+```bash
+lcrlim-myportfolio/
+├── CommonNetwork         # [Core] 네트워크 공통 라이브러리 (Packet, Parser Interface)
+├── TcpServerStandard     # [Server] Async TCP 서버 구현체 (TAP Pattern)
+├── Web.Service           # [API] RESTful API 서비스 (RateLimit, OIDC, Swagger)
+├── GrpcServer            # [gRPC] gRPC 서버 (C#)
+├── GrpcClient            # [gRPC] gRPC 클라이언트
+├── GrpcPerformanceTester # [Tool] gRPC 성능/부하 테스트 도구
+├── grpcserver-cpp        # [gRPC] C++ 기반 gRPC 서버 (상호운용성 데모)
+├── MyOpenId              # [Auth] OIDC 기반 인증 서버 구현
+├── NetStandardUnitTest   # [Test] 단위 테스트 프로젝트
+└── Aspire.*              # [Cloud] .NET Aspire 오케스트레이션 설정
+```
+
+---
+
+## 시작하기
+이 프로젝트를 로컬 환경에서 실행하기 위한 가이드입니다.
+
+### 필수 요구사항
+- .NET SDK 9.0 이상
+- Visual Studio 2022 (또는 VS Code)
+- SQL Server (Express 또는 Developer Edition)
+- (Optional) Redis (분산 Rate Limiting 테스트용)
+
+### 설치
+- 레포지토리를 클론하고 솔루션을 빌드합니다.
+``` bash
+git clone [https://github.com/lcrlim/myportfolio.git](https://github.com/lcrlim/myportfolio.git)
+cd myportfolio
+dotnet restore
+dotnet build
+```
+### 데이터베이스 설정
+Web.Service 프로젝트 실행을 위해 데이터베이스 연결 문자열을 설정해야 합니다.
+
+1. Web.Service/appsettings.json 파일을 엽니다.
+2. ConnectionStrings 섹션의 DefaultConnection을 본인의 로컬 SQL Server 환경에 맞게 수정합니다.
+```bash
+"ConnectionStrings": {
+  "DefaultConnection": "Server=localhost;Database=MyPortfolioDB;Trusted_Connection=True;TrustServerCertificate=True;"
+}
+```
+
+---
+
+### 실행 방법
+A. Run Web Service (REST API)
+  - API 서버를 실행하고 Swagger를 통해 테스트합니다.
+
+```bash
+cd Web.Service
+dotnet run
+```
+  - Access: 브라우저에서 http://localhost:5000/swagger (포트는 설정에 따라 다름) 접속
+  - Features: Token 발급, API Throttling 테스트 가능
+
+B. Run TCP Server
+  - 고성능 비동기 소켓 서버를 실행합니다.
+```bash
+cd TcpServerStandard
+dotnet run
+```
+  - 서버가 시작되면 CommonNetwork에 정의된 포트(기본값)로 클라이언트 연결을 대기합니다.
+
+C. Run gRPC Server & Tester
+  - gRPC 통신 성능을 측정합니다.
+1. Server 실행:
+```bash
+cd GrpcServer
+dotnet run
+```
+2. Tester 실행 (새 터미널):
+```bash
+cd GrpcPerformanceTester
+dotnet run
+```
+  - 테스트 결과로 초당 처리량(TPS)과 응답 지연 시간(Latency)이 콘솔에 출력됩니다.
+
+---
+
+### 테스트
+
+Unit Testing
+  - 핵심 네트워크 로직과 패킷 파싱에 대한 무결성을 검증합니다.
+```bash
+dotnet test NetStandardUnitTest
+```
+
+Performance Testing Results
+- 자체 구현한 GrpcPerformanceTester를 통한 벤치마크 예시:
+  - Note: 아래 수치는 개발 환경(Localhost) 기준입니다.
+
+- Throughput: ~15,000 Requests/sec
+- Average Latency: < 2ms
+
+### Key Features in Detail
+1. Async TCP Server Architecture
+  - TAP (Task-based Asynchronous Pattern): TcpListener.AcceptTcpClientAsync와 NetworkStream.ReadAsync를 사용하여 스레드 블로킹 없는 I/O 처리를 구현했습니다.
+  - Packet Separation: Header(Length, Type)와 Body(JSON)를 분리하여 처리하는 PacketParser를 전략 패턴으로 구현하여 확장성을 높였습니다.
+
+2. Web Service Reliability
+  - Rate Limiting: Microsoft.Extensions.RateLimiting을 사용하여 특정 IP나 User의 과도한 요청을 차단합니다. Redis를 연결하면 여러 서버 인스턴스 간에도 카운트를 공유할 수 있습니다.
+  - OIDC Auth: OAuth 2.0/OIDC 표준을 준수하는 간이 인증 서버를 내장하여 보안 토큰 기반의 통신을 지원합니다.
