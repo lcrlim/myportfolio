@@ -13,12 +13,6 @@ namespace MyCommonNet
         public const int PACKET_HEADER_SIZE = PACKET_HEADER_LEN_SIZE + PACKET_HEADER_TYPE_SIZE;
         public const int PACKET_MAX_SIZE = 65536;
 
-        //public enum Type
-        //{
-        //    PING = 1,
-        //    PONG = 2,
-        //}
-
         public enum PacketType
         {
             PING = 1,

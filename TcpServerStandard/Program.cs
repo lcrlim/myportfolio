@@ -11,48 +11,7 @@ public class Program
 {
     private static async Task Main(string[] args)
     {
-        //    // 로그 초기화
-        //    Log.Logger = new LoggerConfiguration()
-        //        .WriteTo.Console(outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff}] [{Level:u3}] [{ThreadId}] {Message:lj}{NewLine}")
-        //        .WriteTo.File($"logs/log_.txt", rollingInterval: RollingInterval.Day,
-        //            outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff}] [{Level:u3}] [{ThreadId}] {Message:lj}{NewLine}")
-        //        .Enrich.WithThreadId()
-        //        .CreateLogger();
-
-        //    int port = 8888;
-        //    if (args.Length > 0)
-        //    {
-        //        // 임의로 1번째는 포트
-        //        int.TryParse(args[0], out port);
-        //    }
-
-        //    TcpServer server = new TcpServer();
-
-        //    var cts = new CancellationTokenSource();
-        //    var startedTask = server.Start(port, new PacketDispatcher(), cts.Token);
-
-        //    var process = Process.GetCurrentProcess();
-
-        //    Log.Logger.Information($"Tcp server start {process.ProcessName}(PID:{process.Id}) - Port:{port}");
-
-        //    while (true)
-        //    {
-        //        Log.Logger.Information("Press q or quit to exit...");
-        //        var str = Console.ReadLine();
-        //        if (str?.ToLower() == "q" || str?.ToLower() == "quit" || str?.ToLower() == "exit")
-        //        {
-        //            Log.Logger.Information("Process terminate by console command");
-        //            break;
-        //        }
-        //    }
-
-        //    cts.Cancel();
-        //    await startedTask;
-        //    Log.Logger.Information("Tcp server terminated");
-
-        //    Environment.Exit(0);
-
-        // 로그 초기화 (기존 그대로)
+        // 로그 초기화
         Log.Logger = new LoggerConfiguration()
             .WriteTo.Console(outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff}] [{Level:u3}] [{ThreadId}] {Message:lj}{NewLine}")
             .WriteTo.File("logs/log_.txt",
@@ -83,9 +42,6 @@ public class Program
 
             // IPacketHandler<T> 구현 클래스들을 한 번에 등록
             services.AddPacketHandlersFromAssembly(handlerAssembly);
-
-            // 외부 의존 서비스들 등록 (예제)
-            //services.AddSingleton<IFakeExternalService, FakeExternalService>();
 
             // PacketDispatcher 등록
             services.AddSingleton<IPacketDispatcher>(sp =>
