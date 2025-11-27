@@ -1,5 +1,7 @@
+using Microsoft.Extensions.DependencyInjection;
 using MyCommonNet;
 using Serilog;
+using TcpServerStandard;
 
 namespace NetStandardUnitTest
 {
@@ -12,10 +14,20 @@ namespace NetStandardUnitTest
         [TestMethod]
         public async Task TestPingPong()
         {
+            var services = new ServiceCollection();
+
+            // 핸들러들이 들어있는 어셈블리 (PacketPingHandler 기준)
+            var handlerAssembly = typeof(PacketPingHandler).Assembly;
+            services.AddPacketHandlersFromAssembly(handlerAssembly);
+            services.AddSingleton<IPacketDispatcher>(sp => new PacketDispatcher(sp, handlerAssembly));
+
+            var serviceProvider = services.BuildServiceProvider();
+            var dispatcher = serviceProvider.GetRequiredService<IPacketDispatcher>();
+
             TcpServer server = new TcpServer();
 
             var cts = new CancellationTokenSource();
-            var serverTask = server.Start(8888, new TcpServerStandard.PacketDispatcher(), cts.Token);
+            var serverTask = server.Start(8888, dispatcher, cts.Token);
             Console.WriteLine($"Server started");
 
             using (var client = new TestClient())
