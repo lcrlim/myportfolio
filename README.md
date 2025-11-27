@@ -1,11 +1,11 @@
-# High-Performance .NET Server Architecture Portfolio
+# .NET Core Server Portfolio
 
 ![Platform](https://img.shields.io/badge/Platform-.NET%20Core-512BD4?style=flat-square&logo=dotnet)
 ![Language](https://img.shields.io/badge/Language-C%23%20%7C%20C%2B%2B-blue?style=flat-square)
 ![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 ![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen?style=flat-square)
 
-> **Enterprise-grade server application samples demonstrating high-concurrency TCP networking, scalable REST APIs, and gRPC microservices integration.**
+> **Server application samples demonstrating high-concurrency TCP networking, scalable REST APIs, and gRPC microservices integration.**
 
 ---
 
