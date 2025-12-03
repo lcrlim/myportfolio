@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Serilog;
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.ObjectPool;
 
 namespace MyCommonNet
 {
@@ -17,6 +18,8 @@ namespace MyCommonNet
     {
         private TcpListener? server;
         private IPacketDispatcher? dispatcher;
+        private ObjectPool<ClientWorker>? clientPool;
+        private long connectionIdCounter = 0;
 
         /// <summary>
         /// 서버 시작
@@ -36,35 +39,96 @@ namespace MyCommonNet
                 throw new Exception("Packet dispatcher is null");
             }
 
+            InitClientPool(10000);
+
             this.dispatcher = dispatcher;
 
-            server.Start();
+            server.Start(1000);
             ctoken.Register(server.Stop);
 
             // 여기서 부터 비동기로 실행되도록 yield하여 thread pool 에서 accept 작업을 실행하도록 한다.
             await Task.Yield();
-            Log.Information($"TCP Server started - Port:{port}, IsThreadPool:{Thread.CurrentThread.IsThreadPoolThread}");
 
+            // 단일 루프 대신, 여러 개의 Accept 루프를 동시에 돌려 동시 접속 요청을 빠르게 처리한다.
+            int acceptThreadCount = Environment.ProcessorCount; // 코어 수 만큼만
+            Log.Information($"TCP Server started - Port:{port}, Backlog:5000, AcceptThreads:{acceptThreadCount}");
+
+            // 병렬 accept를 위한 반복 호출
+            var acceptTasks = new Task[acceptThreadCount];
+            for (int i = 0; i < acceptThreadCount; i++)
+            {
+                acceptTasks[i] = RunAcceptLoopAsync(ctoken);
+            }
+
+            // 모든 Accept 루프가 종료되어 서버가 종료될 때까지 대기
+            await Task.WhenAll(acceptTasks);
+        }
+
+        /// <summary>
+        /// 클라이언트 풀을 초기에 생성해 둡니다.
+        /// </summary>
+        /// <param name="initialSize"></param>
+        private void InitClientPool(int initialSize)
+        {
+            // 1. 풀 생성 (최대 풀 사이즈 등 설정 가능)
+            var provider = new DefaultObjectPoolProvider();
+
+            // 풀에 보관할 최대 객체 수. 
+            provider.MaximumRetained = initialSize;
+
+            clientPool = provider.Create(new ClientWorkerPolicy());
+
+            Log.Information("Warming up client pool...");
+            var preAllocated = new List<ClientWorker>(initialSize);
+            for (int i = 0; i < initialSize; i++)
+            {
+                preAllocated.Add(clientPool.Get());
+            }
+            foreach (var worker in preAllocated)
+            {
+                clientPool.Return(worker);
+            }
+            Log.Information($"Client pool warmed up - {initialSize}");
+        }
+
+        /// <summary>
+        /// Accept 루프
+        /// </summary>
+        private async Task RunAcceptLoopAsync(CancellationToken ctoken)
+        {
             while (!ctoken.IsCancellationRequested)
             {
                 try
                 {
-                    // accept connection
+                    // 멀티 스레드 환경에서도 TcpListener.AcceptTcpClientAsync는 스레드 안전하게 백로그 큐를 공유합니다.
                     TcpClient conn = await server.AcceptTcpClientAsync(ctoken).ConfigureAwait(false);
-                    Log.Information($"New connection arrived - {conn.Client.RemoteEndPoint}");
 
-                    // 신규 연결 시 새로운 워커 생성 후 Run
-                    var work = new ClientWorker(conn, this.dispatcher, ctoken);
-                    //_ = Task.Run(work.RunReadAsync, ctoken);
-                    _ = work.RunReadAsync();
+                    long newId = Interlocked.Increment(ref connectionIdCounter);
+
+                    Log.Information($"New connection({conn.Client.RemoteEndPoint}, Id:{newId}) arrived");
+
+                    // [최적화 4] Socket 설정 최적화 (Nagle 알고리즘 비활성화 등)
+                    conn.NoDelay = true;
+                    conn.ReceiveBufferSize = 8192;
+                    conn.SendBufferSize = 8192;
+
+                    // 풀링된 객체 사용
+                    var work = clientPool.Get();
+                    work.SetClient(newId, conn, this.dispatcher, ctoken);
+
+                    // 읽기 작업 시작 (Fire-and-forget)
+                    _ = work.RunReadAsync(clientPool);
                 }
                 catch (OperationCanceledException)
                 {
-                    Log.Logger.Warning("Tcp server terminate signal");
+                    // 서버 종료 시그널
+                    Log.Logger.Fatal($"Serve stop signal arrived");
+                    break;
                 }
                 catch (Exception ex)
                 {
-                    Log.Logger.Error($"Error during accept - {ex.ToString()}");
+                    // 예외 발생 시 로그만 찍고 루프는 유지해야 함
+                    Log.Logger.Error($"Error during accept loop - {ex.Message}");
                 }
             }
         }

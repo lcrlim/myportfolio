@@ -20,7 +20,7 @@ namespace TcpServerStandard
 
         public async Task<MyPacket?> HandleAsync(PacketPing packet, CancellationToken cancellationToken = default)
         {
-            Log.Logger.Information($"Ping packet arrived : Num={packet.Num}, Str={packet.Str}");
+            //Log.Logger.Information($"Ping packet arrived - Num:{packet.Num}, Str:{packet.Str}");
             // 응답 패킷 생성 (MyPacket 상속 타입)
             var pong = new PacketPong
             {

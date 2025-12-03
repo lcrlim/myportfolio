@@ -10,6 +10,7 @@ using System.Text.Json.Serialization;
 using System.Text.Json;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
+using Microsoft.Extensions.ObjectPool;
 
 namespace MyCommonNet
 {
@@ -18,23 +19,59 @@ namespace MyCommonNet
     /// </summary>
     public class ClientWorker
     {
-        private TcpClient client;
-        private CancellationToken ct;
+        private long connId;
+        private TcpClient? client;
+        private CancellationToken? ct;
         private PacketParser parser;
-        private IPacketDispatcher dispatcher;
+        private IPacketDispatcher? dispatcher;
 
-        public ClientWorker(TcpClient conn, IPacketDispatcher dispatcher, CancellationToken ctoken)
+        public ClientWorker() => this.parser = new PacketParser();
+
+        public ClientWorker(long connectionId, TcpClient conn, IPacketDispatcher dispatcher, CancellationToken ctoken)
         {
+            this.connId = connectionId;
             this.client = conn;
             this.ct = ctoken;
             this.parser = new PacketParser(conn.GetStream());
             this.dispatcher = dispatcher;
         }
 
-        public async Task RunReadAsync()
+        public void Reset()
+        {
+            if (client != null)
+            {
+                try 
+                { 
+                    client.Dispose(); 
+                } catch { }
+            }
+            this.connId = 0;
+            this.client = null;
+            this.ct = null;
+            this.dispatcher = null;
+            this.parser.ResetStream();
+        }
+
+        public void SetClient(long connectionId, TcpClient conn, IPacketDispatcher dispatcher, CancellationToken ctoken)
+        {
+            this.connId = connectionId;
+            this.client = conn;
+            this.ct = ctoken;
+            this.dispatcher = dispatcher;
+            this.parser.SetStream(conn.GetStream());
+        }
+
+        public async Task RunReadAsync(ObjectPool<ClientWorker> pool)
         {
             try
             {
+                if (client == null || dispatcher == null)
+                {
+                    Log.Logger.Error($"Client or dispatcher is null in ClientWorker(Id:{connId})");
+                    pool.Return(this);
+                    return;
+                }
+
                 using (var stream = client.GetStream())
                 {   
                     // 데이터 읽기 반복
@@ -54,19 +91,20 @@ namespace MyCommonNet
             }
             catch (ObjectDisposedException)
             {
-                Log.Logger.Information($"Connection closed");
+                Log.Logger.Information($"Connection(Id:{connId}) closed");
             }
-            catch (IOException)
+            catch (SocketException ex)
             {
-                Log.Logger.Information($"Connection closed, write failed");
+                // 소켓 관련 에러 (연결 끊김 등)
+                Log.Logger.Information($"Connection(Id:{this.connId}) closed by socket error: {ex.SocketErrorCode}");
             }
             catch (Exception ex)
             {
-                Log.Logger.Warning($"Error ocurred - {ex.ToString()}");
+                Log.Logger.Warning($"Connection(Id:{this.connId}) closed by error - {ex.Message}");
             }
             finally
             {
-                client.Dispose();
+                pool.Return(this);
             }
         }
     }

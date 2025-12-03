@@ -17,6 +17,7 @@
   - 패킷이 추가될 때 사용자는 아래의 2가지 행위만 구현합니다.
     - PacketType 및 패킷 클래스 정의
     - 패킷을 처리 로직이 구현된 Handler 클래스 구현
+  - Client 객체를 ObjectPool로 구성해 사전 생성하고 재활용합니다.
 - Rest API 서버는 **분산 시스템의 트래픽 제어(Rate Limiting)**, **표준 인증 프로토콜(OIDC)** 등 기술적 요구사항 구현을 추가하였고, **Swagger**를 통한 문서를 제공합니다.
 
 ### 주요 목표
@@ -107,7 +108,8 @@ cd TcpClientStandard
 dotnet run
 ```
   - 서버가 시작되면 Program.cs에 고정된 포트(기본값:8888)로 클라이언트 연결을 대기합니다.
-  - 테스트 클라이언트를 실행하면 IP와 Port를 입력하고 help, ping, login 등을 테스트 할 수 있습니다.
+  - 테스트 클라이언트를 실행하면 127.0.0.1:8888 로 자동 연결합니다. help, ping, login, run 등을 테스트 할 수 있습니다.
+  - 테스트 클라이언트에서 run을 입력하면 1000개의 연결을 연결하고 login -> ping 1000회 를 수행하고 모든 테스트가 완료될때까지 시간과 request/sec를 측정합니다.
     
 B. Run Web Service (REST API)
   - API 서버를 실행하고 Swagger를 통해 테스트합니다.

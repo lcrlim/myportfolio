@@ -365,3 +365,4 @@ FodyWeavers.xsd
 /OpenSource/Nito.Async.Sockets/..svnbridge/.svnbridge
 /OpenSource/Nito.Async/..svnbridge
 /OpenSource/Nito.Async/..svnbridge/.svnbridge
+/grpcserver-cpp/build

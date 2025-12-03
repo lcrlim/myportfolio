@@ -73,6 +73,14 @@ namespace MyCommonNet
         }
 
         /// <summary>
+        /// 네트워크 스트림 초기화
+        /// </summary>
+        public void ResetStream()
+        {
+            this.stream = null;
+        }
+
+        /// <summary>
         /// 네트워크 스트림 조회
         /// </summary>
         /// <returns></returns>

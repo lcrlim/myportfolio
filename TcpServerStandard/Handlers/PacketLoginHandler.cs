@@ -1,4 +1,5 @@
 ﻿using MyCommonNet;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,7 @@ namespace TcpServerStandard
     {
         public async Task<MyPacket?> HandleAsync(PacketLogin packet, CancellationToken cancellationToken = default)
         {
+            //Log.Logger.Information($"Login packet arrived - UserId:{packet.UserId}");
             // 응답 패킷 생성 (MyPacket 상속 타입)
             var pong = new PacketLoginResult
             {
