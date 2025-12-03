@@ -30,10 +30,10 @@ namespace MyCommonNet
             foreach (var h in handlerTypes)
             {
                 // 1) IPacketHandler<T> 구현 타입 등록
-                services.AddTransient(h.HandlerInterface!, h.Type);
+                services.AddSingleton(h.HandlerInterface!, h.Type);
 
                 // 2) 구현 타입 자체도 등록
-                services.AddTransient(h.Type);
+                services.AddSingleton(h.Type);
             }
 
             return services;

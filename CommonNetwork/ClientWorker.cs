@@ -63,11 +63,15 @@ namespace MyCommonNet
 
         public async Task RunReadAsync(ObjectPool<ClientWorker> pool)
         {
+            bool added = false;
             try
             {
+                ServerMetrics.IncrementConnectionCount();
+                added = true;
+
                 if (client == null || dispatcher == null)
                 {
-                    Log.Logger.Error($"Client or dispatcher is null in ClientWorker(Id:{connId})");
+                    Log.Logger.Error("Client or dispatcher is null in ClientWorker(Id:{ConnId})", connId);
                     pool.Return(this);
                     return;
                 }
@@ -79,6 +83,7 @@ namespace MyCommonNet
                     {
                         // 패킷 읽기                        
                         MyPacket req = await parser.ReadPacket().ConfigureAwait(false);
+                        ServerMetrics.IncrementPacketCount();
 
                         // 여기서 데이터를 원하는 형태로 파싱하고 처리합니다.
                         MyPacket? res = await this.dispatcher.DispatchAsync(req).ConfigureAwait(false);
@@ -91,19 +96,23 @@ namespace MyCommonNet
             }
             catch (ObjectDisposedException)
             {
-                Log.Logger.Information($"Connection(Id:{connId}) closed");
+                Log.Logger.Information("Connection(Id:{ConnId}) closed", connId);
             }
             catch (SocketException ex)
             {
                 // 소켓 관련 에러 (연결 끊김 등)
-                Log.Logger.Information($"Connection(Id:{this.connId}) closed by socket error: {ex.SocketErrorCode}");
+                Log.Logger.Information("Connection(Id:{ConnId}) closed by socket error: {SocketErrorCode}", this.connId, ex.SocketErrorCode);
             }
             catch (Exception ex)
             {
-                Log.Logger.Warning($"Connection(Id:{this.connId}) closed by error - {ex.Message}");
+                Log.Logger.Warning("Connection(Id:{ConnId}) closed by error - {Message}", this.connId, ex.Message);
             }
             finally
             {
+                if (added)
+                {
+                    ServerMetrics.DecrementConnectionCount();
+                }
                 pool.Return(this);
             }
         }

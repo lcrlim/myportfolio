@@ -21,7 +21,7 @@ namespace TcpServerStandard
         {
             var process = Process.GetCurrentProcess();
 
-            Log.Logger.Information($"Start {process.ProcessName}(PID:{process.Id}) as console mode");
+            Log.Logger.Information("Start {ProcessName}(PID:{ProcessId}) as console mode", process.ProcessName, process.Id);
 
             while(true)
             {

@@ -43,7 +43,7 @@ namespace MyCommonNet
 
             this.dispatcher = dispatcher;
 
-            server.Start(1000);
+            server.Start(1000); // 백로그 1000 설정
             ctoken.Register(server.Stop);
 
             // 여기서 부터 비동기로 실행되도록 yield하여 thread pool 에서 accept 작업을 실행하도록 한다.
@@ -51,7 +51,7 @@ namespace MyCommonNet
 
             // 단일 루프 대신, 여러 개의 Accept 루프를 동시에 돌려 동시 접속 요청을 빠르게 처리한다.
             int acceptThreadCount = Environment.ProcessorCount; // 코어 수 만큼만
-            Log.Information($"TCP Server started - Port:{port}, Backlog:5000, AcceptThreads:{acceptThreadCount}");
+            Log.Information("TCP Server started - Port:{Port}, Backlog:5000, AcceptThreads:{AcceptThreadCount}", port, acceptThreadCount);
 
             // 병렬 accept를 위한 반복 호출
             var acceptTasks = new Task[acceptThreadCount];
@@ -88,7 +88,7 @@ namespace MyCommonNet
             {
                 clientPool.Return(worker);
             }
-            Log.Information($"Client pool warmed up - {initialSize}");
+            Log.Information("Client pool warmed up - {InitialSize}", initialSize);
         }
 
         /// <summary>
@@ -98,37 +98,51 @@ namespace MyCommonNet
         {
             while (!ctoken.IsCancellationRequested)
             {
+                TcpClient? conn = null;
                 try
                 {
                     // 멀티 스레드 환경에서도 TcpListener.AcceptTcpClientAsync는 스레드 안전하게 백로그 큐를 공유합니다.
-                    TcpClient conn = await server.AcceptTcpClientAsync(ctoken).ConfigureAwait(false);
+                    conn = await server.AcceptTcpClientAsync(ctoken).ConfigureAwait(false);
 
                     long newId = Interlocked.Increment(ref connectionIdCounter);
 
-                    Log.Information($"New connection({conn.Client.RemoteEndPoint}, Id:{newId}) arrived");
+                    Log.Information("New connection({RemoteEndPoint}, Id:{NewId}) arrived", conn.Client.RemoteEndPoint, newId);
 
-                    // [최적화 4] Socket 설정 최적화 (Nagle 알고리즘 비활성화 등)
+                    // Socket 설정 최적화
                     conn.NoDelay = true;
                     conn.ReceiveBufferSize = 8192;
                     conn.SendBufferSize = 8192;
+                    conn.LingerState = new LingerOption(true, 0);   // timedwait 없이 바로 삭제 처리
 
                     // 풀링된 객체 사용
                     var work = clientPool.Get();
                     work.SetClient(newId, conn, this.dispatcher, ctoken);
 
-                    // 읽기 작업 시작 (Fire-and-forget)
+                    // 읽기 작업 시작
                     _ = work.RunReadAsync(clientPool);
                 }
                 catch (OperationCanceledException)
                 {
                     // 서버 종료 시그널
-                    Log.Logger.Fatal($"Serve stop signal arrived");
+                    Log.Logger.Fatal("Serve stop signal arrived");
+
+                    if (conn != null)
+                    {
+                        conn.Dispose();
+                        conn = null;
+                    }
                     break;
                 }
                 catch (Exception ex)
                 {
                     // 예외 발생 시 로그만 찍고 루프는 유지해야 함
-                    Log.Logger.Error($"Error during accept loop - {ex.Message}");
+                    Log.Logger.Error("Error during accept loop - {Message}", ex.Message);
+
+                    if (conn != null)
+                    {
+                        conn.Dispose();
+                        conn = null;
+                    }
                 }
             }
         }

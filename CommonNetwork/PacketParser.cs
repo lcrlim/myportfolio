@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Buffers;
+using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,113 +11,115 @@ using System.Threading.Tasks;
 namespace MyCommonNet
 {
     /// <summary>
-    /// 네트워크에서 수신한 패킷을 파싱하고, 객체 패킷을 응답으로 전송하기 위한 parser
-    /// 별도 parser를 구현할 경우 이 클래스를 상속받아 virtual 메소드를 override 하면 된다.
+    /// 수신한 요청 패킷을 역직렬화 해서 객체로 리턴하고 
+    /// 송신할 응답 패킷을 직렬화해서 바이트 배열로 리턴
+    /// Zero Allocation 적용하여 GC 부하를 최소화
+    /// 패킷 크기가 8KB 이하일 경우 고정 버퍼를 사용하고, 큰 사이즈는 ArrayPool 사용 후 반납
     /// </summary>
-    public class PacketParser : IPacketParser
+    public class PacketParser : IPacketParser, IDisposable
     {
-        int lengthSize = 0;
-        int typeSize = 0;
-        int maxLength = 0;
-        /// <summary>
-        /// header 길이 버퍼
-        /// </summary>
-        byte[] lengthBuffer;
-        /// <summary>
-        /// 헤더 타입 버퍼
-        /// </summary>
-        byte[] typeBuffer;
-        // 클라이언트의 네트워크 스트림
-        NetworkStream? stream;
+        private int lengthSize = 0;
+        private int typeSize = 0;
+        private int maxLength = 0;
 
         /// <summary>
-        /// 클라이언트 스트림 없이 파서 생성
+        /// 고정 버퍼 크기
         /// </summary>
-        /// <param name="lengthSize"></param>
-        /// <param name="typeSize"></param>
-        /// <param name="maxLength"></param>
+        private const int FIXED_BUFFER_SIZE = 8192;
+
+        /// <summary>
+        /// 헤더 읽기 전용 고정 버퍼
+        /// </summary>
+        private byte[] headerReadBuffer;
+
+        /// <summary>
+        /// 수신용 고정 버퍼
+        /// </summary>
+        private byte[] fixedReadBuffer;
+
+        /// <summary>
+        /// 송신용 고정 버퍼
+        /// </summary>
+        private byte[] fixedWriteBuffer;
+
+        /// <summary>
+        /// 클라이언트와 연결된 네트워크 스트림
+        /// </summary>
+        private NetworkStream? stream;
+
+        /// <summary>
+        /// 생성자
+        /// </summary>
+        /// <param name="lengthSize">패킷 길이 필드의 크기 (바이트)</param>
+        /// <param name="typeSize">패킷 타입 필드의 크기 (바이트)</param>
+        /// <param name="maxLength">허용할 최대 패킷 크기 (바이트)</param>
         public PacketParser(int lengthSize = Packet.PACKET_HEADER_LEN_SIZE, int typeSize = Packet.PACKET_HEADER_TYPE_SIZE, int maxLength = Packet.PACKET_MAX_SIZE)
         {
             this.lengthSize = lengthSize;
             this.typeSize = typeSize;
             this.maxLength = maxLength;
 
-            lengthBuffer = new byte[lengthSize];
-            typeBuffer = new byte[typeSize];
-        }
+            // 헤더 읽기용 버퍼 별도 할당
+            this.headerReadBuffer = new byte[lengthSize + typeSize];
+            // 읽기, 쓰기용 고정 버퍼 할당
+            this.fixedReadBuffer = new byte[FIXED_BUFFER_SIZE];
+            this.fixedWriteBuffer = new byte[FIXED_BUFFER_SIZE];
 
-        /// <summary>
-        /// 클라이언트의 스트림 저장하면서 파서 생성
-        /// </summary>
-        /// <param name="stream"></param>
-        /// <param name="lengthSize"></param>
-        /// <param name="typeSize"></param>
-        /// <param name="maxLength"></param>
-        public PacketParser(NetworkStream stream, int lengthSize = Packet.PACKET_HEADER_LEN_SIZE, int typeSize = Packet.PACKET_HEADER_TYPE_SIZE, int maxLength = Packet.PACKET_MAX_SIZE)
-        {
-            this.stream = stream;
-            this.lengthSize = lengthSize;
-            this.typeSize = typeSize;
-            this.maxLength = maxLength;
-
-            lengthBuffer = new byte[lengthSize];
-            typeBuffer = new byte[typeSize];
-        }
-
-        /// <summary>
-        /// 파서 생성 이후 클라이언트 네트워크 스트림을 설정
-        /// 스트림이 설정되지 않으면 정상 동작하지 않는다.
-        /// </summary>
-        /// <param name="stream"></param>
-        public void SetStream(NetworkStream stream)
-        {
-            this.stream = stream;
-        }
-
-        /// <summary>
-        /// 네트워크 스트림 초기화
-        /// </summary>
-        public void ResetStream()
-        {
             this.stream = null;
         }
 
         /// <summary>
-        /// 네트워크 스트림 조회
+        /// 생성자
         /// </summary>
-        /// <returns></returns>
-        public NetworkStream? GetStream()
+        /// <param name="stream">연결된 네트워크 스트림</param>
+        /// <param name="lengthSize">패킷 길이 필드의 크기</param>
+        /// <param name="typeSize">패킷 타입 필드의 크기</param>
+        /// <param name="maxLength">최대 패킷 크기</param>
+        public PacketParser(NetworkStream stream, int lengthSize = Packet.PACKET_HEADER_LEN_SIZE, int typeSize = Packet.PACKET_HEADER_TYPE_SIZE, int maxLength = Packet.PACKET_MAX_SIZE)
+            : this(lengthSize, typeSize, maxLength)
         {
-            return this.stream;
-        }
-
-        public int GetLengthSize()
-        {
-            return lengthSize;
-        }
-
-        public int GetTypeSize()
-        {
-            return typeSize;
-        }
-
-        public int GetHeaderSize()
-        {
-            return GetTypeSize() + GetLengthSize();
-        }
-
-        public int GetMaxLength()
-        {
-            return maxLength;
+            this.stream = stream;
         }
 
         /// <summary>
-        /// 패킷 읽기 메소드, 상속 클래스 구현시 override 대상
+        /// 네트워크 스트림을 설정
         /// </summary>
-        /// <returns></returns>
-        /// <exception cref="Exception">일반 오류</exception>
-        /// <exception cref="ObjectDisposedException">커넥션 끊김</exception>
-        /// <exception cref="ArgumentOutOfRangeException">최대 패킷 길이 초과</exception>
+        public void SetStream(NetworkStream stream) => this.stream = stream;
+
+        /// <summary>
+        /// 네트워크 스트림 설정을 초기화
+        /// </summary>
+        public void ResetStream() => this.stream = null;
+
+        /// <summary>
+        /// 현재 설정된 네트워크 스트림 반환
+        /// </summary>
+        public NetworkStream? GetStream() => this.stream;
+
+        /// <summary>
+        /// 헤더의 길이 필드 크기를 반환
+        /// </summary>
+        public int GetLengthSize() => lengthSize;
+
+        /// <summary>
+        /// 헤더의 타입 필드 크기를 반환
+        /// </summary>
+        public int GetTypeSize() => typeSize;
+
+        /// <summary>
+        /// 헤더 전체 크기를 반환 (길이 필드 + 타입 필드)
+        /// </summary>
+        public int GetHeaderSize() => GetTypeSize() + GetLengthSize();
+
+        /// <summary>
+        /// 패킷의 최대 크기를 반환
+        /// </summary>
+        public int GetMaxLength() => maxLength;
+
+        /// <summary>
+        /// 네트워크 스트림에서 패킷 읽기
+        /// </summary>
+        /// <returns>수신된 패킷 객체 (MyPacket)</returns>
         public virtual async Task<MyPacket> ReadPacket()
         {
             NetworkStream? stream = GetStream();
@@ -124,87 +128,170 @@ namespace MyCommonNet
                 throw new Exception("Network stream is null");
             }
 
-            // 버퍼 초기화
-            Array.Clear(lengthBuffer, 0, lengthBuffer.Length);
-            Array.Clear(typeBuffer, 0, typeBuffer.Length);
+            int headerSize = GetHeaderSize();
 
-            // 패킷의 길이 읽기
-            int readSize = await stream.ReadAsync(lengthBuffer, 0, lengthBuffer.Length)
-                .ConfigureAwait(false);
-            
-            if (readSize == 0)
+            // 1. 헤더 읽기 (전용 헤더 버퍼 사용)
+            try 
+            {
+                await stream.ReadExactlyAsync(headerReadBuffer.AsMemory(0, headerSize)).ConfigureAwait(false);
+            }
+            catch (EndOfStreamException)
             {
                 throw new ObjectDisposedException("network stream");
             }
 
-            int packetLength = BitConverter.ToInt32(lengthBuffer, 0);
-            if (packetLength > GetMaxLength())
+            // 2. 헤더 파싱 (메모리 할당 없이 변환)
+            ReadOnlySpan<byte> headerSpan = headerReadBuffer.AsSpan(0, headerSize);
+            int packetLength = BinaryPrimitives.ReadInt32LittleEndian(headerSpan.Slice(0, this.lengthSize));
+            int packetType = BinaryPrimitives.ReadInt32LittleEndian(headerSpan.Slice(this.lengthSize, this.typeSize));
+
+            // 패킷 크기 유효성 검사
+            if (packetLength > GetMaxLength() || packetLength < headerSize)
             {
-                throw new ArgumentOutOfRangeException("Packet size too big");
+                throw new ArgumentOutOfRangeException($"Invalid Packet size: {packetLength}");
             }
 
-            // 패킷의 타입 읽기
-            readSize = await stream.ReadAsync(typeBuffer, 0, typeBuffer.Length)
-                .ConfigureAwait(false);
-            if (readSize == 0)
+            // 3. 바디 데이터 읽기
+            int bodySize = packetLength - headerSize;
+            ReadOnlyMemory<byte> bodyMemory = ReadOnlyMemory<byte>.Empty;
+
+            if (bodySize > 0)
             {
-                throw new ObjectDisposedException("network stream");
+                byte[]? rentedBuffer = null;
+                Memory<byte> targetBuffer;
+
+                // 바디 크기가 8KB를 초과하면 ArrayPool 사용
+                if (bodySize > FIXED_BUFFER_SIZE)
+                {
+                    rentedBuffer = ArrayPool<byte>.Shared.Rent(bodySize);
+                    targetBuffer = rentedBuffer.AsMemory(0, bodySize);
+                }
+                else
+                {
+                    // 8KB 이하일 경우 고정 버퍼 재사용
+                    targetBuffer = fixedReadBuffer.AsMemory(0, bodySize);
+                }
+
+                try
+                {
+                    // 바디 데이터 수신
+                    await stream.ReadExactlyAsync(targetBuffer).ConfigureAwait(false);
+                    
+                    if (rentedBuffer == null)
+                    {
+                        // 고정 버퍼 사용 시, 메모리 복사 없이 전달
+                        bodyMemory = targetBuffer;
+                    }
+                    else
+                    {
+                        // ArrayPool 사용 시, 버퍼 반납이 필요하니 일단 복사하지만, 대용량 패킷은 적으니 일단 감수
+                        bodyMemory = targetBuffer.ToArray();
+                        ArrayPool<byte>.Shared.Return(rentedBuffer);    // 반납
+                    }
+                }
+                catch (EndOfStreamException)
+                {
+                    if (rentedBuffer != null) ArrayPool<byte>.Shared.Return(rentedBuffer);
+                    throw new ObjectDisposedException("network stream");
+                }
             }
-            int packetType = BitConverter.ToInt32(typeBuffer, 0);
 
-            // 데이터 읽기
-            byte[] dataBuffer = new byte[packetLength - (lengthBuffer.Length + typeBuffer.Length)];
-            // 데이터 길이에서 헤더 길이를 뺌
-            readSize = await stream.ReadAsync(dataBuffer, 0, packetLength - (lengthBuffer.Length + typeBuffer.Length))
-                .ConfigureAwait(false);
-            if (readSize == 0)
-            {
-                throw new ObjectDisposedException("network stream");
-            }
-
-            // 수신된 데이터를 문자열로 변환
-            string dataReceived = Encoding.UTF8.GetString(dataBuffer, 0, readSize);
-
+            // 패킷 객체 생성 및 반환
+            // BodyMemory(byte[])를 통해 데이터를 전달
             return new MyPacket
             {
                 Len = packetLength,
                 Type = packetType,
-                Body = dataReceived
+                Body = null, 
+                BodyMemory = bodyMemory
             };
         }
 
         /// <summary>
-        /// 패킷 쓰기 메소드, 상속 클래스 구현시 override 대상
+        /// 패킷을 네트워크 스트림으로 전송
         /// </summary>
-        /// <param name="packet"></param>
-        /// <returns></returns>
+        /// <param name="packet">전송할 패킷 객체</param>
         public virtual async Task WritePacket(MyPacket packet)
         {
             var stream = GetStream();
             if (stream != null)
             {
-                // 데이터 string이 있으면 byte로 변환
-                byte[]? resData = null;
-                if (packet.Body != null)
-                    resData = Encoding.UTF8.GetBytes(packet.Body);
+                int bodyByteCount = 0;
+                bool useBodyMemory = false;
 
-                byte[] resBytes = new byte[GetHeaderSize() + (resData?.Length ?? 0)];
-
-                // length 바이트로
-                // 패킷 길이는 헤더사이즈 + 바디 사이즈로 설정한다.
-                packet.Len = GetHeaderSize() + (resData == null ? 0 : resData.Length);
-                BitConverter.GetBytes(packet.Len).CopyTo(resBytes, 0);
-
-                // type 바이트로
-                BitConverter.GetBytes(packet.Type).CopyTo(resBytes, GetLengthSize());
-
-                if (resData != null)
+                // BodyMemory에 데이터가 있으면 우선 사용하고, 없으면 Body(문자열)를 사용
+                if (!packet.BodyMemory.IsEmpty && string.IsNullOrEmpty(packet.Body))
                 {
-                    Array.Copy(resData, 0, resBytes, GetHeaderSize(), resData.Length);
+                    bodyByteCount = packet.BodyMemory.Length;
+                    useBodyMemory = true;
+                }
+                else if (!string.IsNullOrEmpty(packet.Body))
+                {
+                    bodyByteCount = Encoding.UTF8.GetByteCount(packet.Body);
                 }
 
-                await stream.WriteAsync(resBytes).ConfigureAwait(false);
+                int totalSize = GetHeaderSize() + bodyByteCount;
+                
+                byte[]? rentedBuffer = null;
+                Memory<byte> bufferMemory;
+                Span<byte> bufferSpan;
+
+                // 전송할 데이터가 8KB를 초과하면 ArrayPool 사용
+                if (totalSize > FIXED_BUFFER_SIZE)
+                {
+                    rentedBuffer = ArrayPool<byte>.Shared.Rent(totalSize);
+                    bufferMemory = rentedBuffer.AsMemory(0, totalSize);
+                    bufferSpan = rentedBuffer.AsSpan(0, totalSize);
+                }
+                else
+                {
+                    // 8KB 이하일 경우 고정 버퍼 사용
+                    bufferMemory = fixedWriteBuffer.AsMemory(0, totalSize);
+                    bufferSpan = fixedWriteBuffer.AsSpan(0, totalSize);
+                }
+
+                try
+                {
+                    packet.Len = totalSize;
+
+                    // 1. 헤더 쓰기
+                    BinaryPrimitives.WriteInt32LittleEndian(bufferSpan.Slice(0, this.lengthSize), packet.Len);
+                    BinaryPrimitives.WriteInt32LittleEndian(bufferSpan.Slice(this.lengthSize, this.typeSize), packet.Type);
+
+                    // 2. 바디 쓰기
+                    if (bodyByteCount > 0)
+                    {
+                        if (useBodyMemory)
+                        {
+                            // 메모리에서 직접 복사
+                            packet.BodyMemory.Span.CopyTo(bufferSpan.Slice(GetHeaderSize(), bodyByteCount));
+                        }
+                        else if (packet.Body != null)
+                        {
+                            // 문자열을 UTF8 바이트로 인코딩하여 버퍼에 기록
+                            Encoding.UTF8.GetBytes(packet.Body, bufferSpan.Slice(GetHeaderSize(), bodyByteCount));
+                        }
+                    }
+
+                    // 3. 데이터 전송
+                    await stream.WriteAsync(bufferMemory).ConfigureAwait(false);
+                }
+                finally
+                {
+                    // 대여한 버퍼가 있다면 반납
+                    if (rentedBuffer != null)
+                    {
+                        ArrayPool<byte>.Shared.Return(rentedBuffer);
+                    }
+                }
             }
+        }
+
+        /// <summary>
+        /// 리소스 해제
+        /// </summary>
+        public void Dispose()
+        {
         }
     }
 }

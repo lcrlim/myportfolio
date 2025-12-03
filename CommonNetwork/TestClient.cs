@@ -1,10 +1,10 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using System.Text.Json; // System.Text.Json 사용
 
 namespace MyCommonNet
 {
@@ -46,39 +46,51 @@ namespace MyCommonNet
             await parser.WritePacket(req);
             MyPacket res = await parser.ReadPacket();
 
-            if (res.Body == null)
-                return default(T);
+            // Body가 있으면 Body 사용 (레거시), 없으면 BodyMemory 사용
+            if (!string.IsNullOrEmpty(res.Body))
+            {
+                return JsonSerializer.Deserialize<T>(res.Body);
+            }
+            
+            if (!res.BodyMemory.IsEmpty)
+            {
+                 return JsonSerializer.Deserialize<T>(res.BodyMemory.Span);
+            }
 
-            return JsonConvert.DeserializeObject<T>(res.Body);
+            return default(T);
         }
 
         public async Task<PacketPong?> Ping(int pingNumber, string pingString)
         {
+            byte[] bodyBytes = JsonSerializer.SerializeToUtf8Bytes(new PacketPing
+            {
+                Num = pingNumber,
+                Str = pingString
+            });
+
             var req = new MyPacket
             {
                 Type = (int)Packet.PacketType.PING,
-                Body = JsonConvert.SerializeObject(new PacketPing
-                {
-                    Num = pingNumber,
-                    Str = pingString
-                })
+                BodyMemory = bodyBytes,
+                Len = Packet.PACKET_HEADER_SIZE + bodyBytes.Length
             };
-            req.Len = Packet.PACKET_HEADER_SIZE + req.Body.Length;
 
             return await SendAndReceive<PacketPong>(req);
         }
 
         public async Task<PacketLoginResult?> Login(string userId)
         {
+            byte[] bodyBytes = JsonSerializer.SerializeToUtf8Bytes(new PacketLogin
+            {
+                UserId = userId
+            });
+
             var req = new MyPacket
             {
                 Type = (int)Packet.PacketType.LOGIN,
-                Body = JsonConvert.SerializeObject(new PacketLogin
-                {
-                    UserId = userId
-                })
+                BodyMemory = bodyBytes,
+                Len = Packet.PACKET_HEADER_SIZE + bodyBytes.Length
             };
-            req.Len = Packet.PACKET_HEADER_SIZE + req.Body.Length;
 
             return await SendAndReceive<PacketLoginResult>(req);
         }

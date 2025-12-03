@@ -78,7 +78,12 @@ public class Program
                             break;
 
                         case "run": // 부하 테스트 명령 추가
-                            await RunLoadTest();
+                            int repeatCount = 1;
+                            if (cmdArgs.Length > 0 && int.TryParse(cmdArgs[0], out int r))
+                            {
+                                repeatCount = r;
+                            }
+                            await RunLoadTest(repeatCount);
                             break;
 
                         default:
@@ -140,76 +145,82 @@ public class Program
     }
 
     // --- 부하 테스트 로직 ---
-    private static async Task RunLoadTest()
+    private static async Task RunLoadTest(int loopCount)
     {
-        Console.WriteLine("==================================================");
-        Console.WriteLine($"부하 테스트 시작: Client {LOAD_TEST_CLIENT_COUNT}개, 각 {LOAD_TEST_REPEAT_COUNT}회 반복");
-        Console.WriteLine("==================================================");
-
-        var stopwatch = Stopwatch.StartNew();
-        var tasks = new List<Task>();
-
-        // 성공/실패 카운트 (스레드 안전)
-        int successCount = 0;
-        int errorCount = 0;
-
-        for (int i = 0; i < LOAD_TEST_CLIENT_COUNT; i++)
+        for (int loop = 1; loop <= loopCount; loop++)
         {
-            int clientId = i;
-            tasks.Add(Task.Run(async () =>
+            Console.WriteLine("==================================================");
+            Console.WriteLine($"부하 테스트 시작 ({loop}/{loopCount}): Client {LOAD_TEST_CLIENT_COUNT}개, 각 {LOAD_TEST_REPEAT_COUNT}회 반복");
+            Console.WriteLine("==================================================");
+
+            var stopwatch = Stopwatch.StartNew();
+            var tasks = new List<Task>();
+
+            // 성공/실패 카운트 (스레드 안전)
+            int successCount = 0;
+            int errorCount = 0;
+
+            for (int i = 0; i < LOAD_TEST_CLIENT_COUNT; i++)
             {
-                try
+                int clientId = i;
+                tasks.Add(Task.Run(async () =>
                 {
-                    // 각 태스크마다 새로운 클라이언트 인스턴스 생성
-                    using (var loadClient = new TestClient())
+                    try
                     {
-                        // 1. Connect
-                        await loadClient.ConnectAsync(SERVER_IP, SERVER_PORT);
-
-                        // 2. Login
-                        await loadClient.Login($"User{clientId}");
-
-                        // 3. Ping Loop
-                        for (int j = 0; j < LOAD_TEST_REPEAT_COUNT; j++)
+                        // 각 태스크마다 새로운 클라이언트 인스턴스 생성
+                        using (var loadClient = new TestClient())
                         {
-                            await loadClient.Ping(j, "LoadTest");
+                            // 1. Connect
+                            await loadClient.ConnectAsync(SERVER_IP, SERVER_PORT);
+
+                            // 2. Login
+                            await loadClient.Login($"User{clientId}");
+
+                            // 3. Ping Loop
+                            for (int j = 0; j < LOAD_TEST_REPEAT_COUNT; j++)
+                            {
+                                await loadClient.Ping(j, "LoadTest");
+                            }
+
+                            // 4. Disconnect (using 블록 종료 시 자동 처리되지만 명시적일 수도 있음)
                         }
 
-                        // 4. Disconnect (using 블록 종료 시 자동 처리되지만 명시적일 수도 있음)
+                        Interlocked.Increment(ref successCount);
                     }
-
-                    Interlocked.Increment(ref successCount);
-                }
-                catch (Exception ex)
-                {
-                    Interlocked.Increment(ref errorCount);
-                    // 에러가 너무 많이 출력되면 콘솔이 느려지므로 첫 번째 에러만 출력하거나 로그 레벨 조정
-                    //if (errorCount <= 5)
-                    //{
+                    catch (Exception ex)
+                    {
+                        Interlocked.Increment(ref errorCount);
+                        // 에러가 너무 많이 출력되면 콘솔이 느려지므로 첫 번째 에러만 출력하거나 로그 레벨 조정
+                        //if (errorCount <= 5)
+                        //{
                         Console.WriteLine($"ErroCount:{errorCount}, Client {clientId} Error: {ex.Message}");
-                    //}
-                }
-            }));
+                        //}
+                    }
+                }));
+            }
+
+            // 모든 클라이언트 작업 완료 대기
+            await Task.WhenAll(tasks);
+            stopwatch.Stop();
+
+            double totalSeconds = stopwatch.Elapsed.TotalSeconds;
+            long totalRequests = (long)successCount * LOAD_TEST_REPEAT_COUNT;
+
+            // 초당 패킷 처리 수 (Ping 1회 + Pong 1회 = 1 Transaction으로 계산 시)
+            double tps = totalRequests / totalSeconds;
+
+            Console.WriteLine("==================================================");
+            Console.WriteLine($"부하 테스트 완료 ({loop}/{loopCount})");
+            Console.WriteLine($"총 소요 시간: {totalSeconds:F3}초");
+            Console.WriteLine($"성공 클라이언트: {successCount} / {LOAD_TEST_CLIENT_COUNT}");
+            Console.WriteLine($"실패 클라이언트: {errorCount}");
+            Console.WriteLine($"총 처리 요청 수 (Ping-Pong): {totalRequests:N0}");
+            Console.WriteLine($"평균 Packet Per Sec (TPS): {tps:N2}");
+            Console.WriteLine("==================================================");
+            
+            // 루프 간 잠시 대기 (선택 사항)
+            if (loop < loopCount) await Task.Delay(1000);
         }
-
-        // 모든 클라이언트 작업 완료 대기
-        await Task.WhenAll(tasks);
-        stopwatch.Stop();
-
-        double totalSeconds = stopwatch.Elapsed.TotalSeconds;
-        long totalRequests = (long)successCount * LOAD_TEST_REPEAT_COUNT;
-
-        // 초당 패킷 처리 수 (Ping 1회 + Pong 1회 = 1 Transaction으로 계산 시)
-        double tps = totalRequests / totalSeconds;
-
-        Console.WriteLine("==================================================");
-        Console.WriteLine("부하 테스트 완료");
-        Console.WriteLine($"총 소요 시간: {totalSeconds:F3}초");
-        Console.WriteLine($"성공 클라이언트: {successCount} / {LOAD_TEST_CLIENT_COUNT}");
-        Console.WriteLine($"실패 클라이언트: {errorCount}");
-        Console.WriteLine($"총 처리 요청 수 (Ping-Pong): {totalRequests:N0}");
-        Console.WriteLine($"평균 Packet Per Sec (TPS): {tps:N2}");
-        Console.WriteLine("==================================================");
     }
 
     private static void PrintHelp()
@@ -217,7 +228,7 @@ public class Program
         Console.WriteLine("---------- Command Help ----------");
         Console.WriteLine("ping <num> [str]   : Ping 패킷 전송. 예) ping 123  /  ping 123 hello");
         Console.WriteLine("login <userName>   : 로그인 패킷 전송(테스트). 예) login aaa");
-        Console.WriteLine("run                : 부하 테스트 실행 (1000 Clients, 10000 Pings)");
+        Console.WriteLine($"run                : 부하 테스트 실행 ({LOAD_TEST_CLIENT_COUNT} Clients, {LOAD_TEST_REPEAT_COUNT} Pings)");
         Console.WriteLine("help or ?          : 이 도움말 표시");
         Console.WriteLine("q / quit / exit    : 클라이언트 종료");
         Console.WriteLine("----------------------------------");
