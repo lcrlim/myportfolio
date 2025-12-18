@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CommonNetwork\MyCommonNet.csproj" />
+    <ProjectReference Include="..\TcpClientStandard\TestTcpClient.csproj" />
     <ProjectReference Include="..\TcpServerStandard\TcpServerStandard.csproj" />
   </ItemGroup>
 

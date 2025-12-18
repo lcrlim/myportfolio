@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,6 +19,8 @@ namespace MyCommonNet
             PONG = 2,
             LOGIN = 3,
             LOGIN_RESULT = 4,
+            CHARACTER_LIST = 5,
+            CHARACTER_LIST_RESULT = 6,
         }
     }
 }

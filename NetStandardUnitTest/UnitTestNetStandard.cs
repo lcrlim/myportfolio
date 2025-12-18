@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using MyCommonNet;
 using Serilog;
+using TcpClientStandard;
 using TcpServerStandard;
 
 namespace NetStandardUnitTest
@@ -9,14 +10,14 @@ namespace NetStandardUnitTest
     public class UnitTestNetStandard
     {
         /// <summary>
-        /// ÇÎÆş tcp Å×½ºÆ®
+        /// í•‘í tcp í…ŒìŠ¤íŠ¸
         /// </summary>
         [TestMethod]
         public async Task TestPingPong()
         {
             var services = new ServiceCollection();
 
-            // ÇÚµé·¯µéÀÌ µé¾îÀÖ´Â ¾î¼Àºí¸® (PacketPingHandler ±âÁØ)
+            // í•¸ë“¤ëŸ¬ë“¤ì´ ë“¤ì–´ìˆëŠ” ì–´ì…ˆë¸”ë¦¬ (PacketPingHandler ê¸°ì¤€)
             var handlerAssembly = typeof(PacketPingHandler).Assembly;
             services.AddPacketHandlersFromAssembly(handlerAssembly);
             services.AddSingleton<IPacketDispatcher>(sp => new PacketDispatcher(sp, handlerAssembly));
@@ -30,7 +31,7 @@ namespace NetStandardUnitTest
             var serverTask = server.Start(8888, dispatcher, cts.Token);
             Console.WriteLine($"Server started");
 
-            using (var client = new TestClient())
+            using (var client = new TcpNetworkClient())
             {
                 await client.ConnectAsync("127.0.0.1", 8888);
                 Console.WriteLine($"Connected");
